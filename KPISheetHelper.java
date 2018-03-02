@@ -13,7 +13,7 @@ public class KPISheetHelper {
     public static final String SQLFILE_GET_ORDER_BY_STATUS_T_HEAD  = "GET_ORDER_BY_STATUS_T_HEAD";
     public static final String SQLFILE_GET_ORDER_BY_STATUS_T_DATA  = "GET_ORDER_BY_STATUS_T_DATA";
 
-    public static final String SQLFILE_GET_ORDER_BY_STATUS_G_HEAD  = "GET_ORDER_BY_STATUS_G_HEAD";
+    //public static final String SQLFILE_GET_ORDER_BY_STATUS_G_HEAD  = "GET_ORDER_BY_STATUS_G_HEAD";
     public static final String SQLFILE_GET_ORDER_BY_STATUS_G_DATA  = "GET_ORDER_BY_STATUS_G_DATA";
 
     public static final String SQLFILE_GET_ERR_T_HEAD  = "GET_ERR_ORDER_T_HEAD";
@@ -89,64 +89,22 @@ public class KPISheetHelper {
 
     }
 
-    public static StringBuilder getGraphModel(String headSql, String bodySql, Object[] tableFilter) {
-
+    public static StringBuilder getGraphModel(String bodySql, Object[] graphFilter) {
         StringBuilder outputString = new StringBuilder();
-        boolean existRows = true;
 
-        outputString.append(
-                "{\n" +
-                "  \"model\": {\n" +
-                "    \"header\": {\n" +
-                "      \"rows\": ["
-        );
-
-        List<KPISQLData> getTableHeader = KPISQLData.getData(findSQL(headSql));
-        if (getTableHeader.size() == 1) {
-            outputString.append(getTableHeader.get(0).data + "\n");
+        outputString.append("{\"series\": [");
+        List<KPISQLData> getData = KPISQLData.getData(findSQL(bodySql),graphFilter);
+        if (getData.size() == 1) {
+            outputString.append(getData.get(0).data + "\n");
         }
         else {
             //NO DATA
             return new StringBuilder();
         }
 
-        // Close header
-        outputString.append(
-                "      ]\n" +
-                "    }"
-        );
-
-        // Model body
-        List<KPISQLData> rows;
-        rows = KPISQLData.getData(findSQL(bodySql),tableFilter);
-
-        if (rows.size() < 1) {existRows = false;}
-
-        if (existRows) {
-            outputString.append(
-                    ", \"body\": {\n" +
-                    "    \"rows\": [\n"
-            );
-        }
-
-        int i = 0;
-        for (KPISQLData sqlData : rows) {
-            outputString.append(sqlData.data + "\n");
-            if (i < (rows.size() - 1)) {
-                outputString.append(", ");
-            }
-            i++;
-        }
-
-        outputString.append(
-                "\n    ]\n" +
-                        "    }\n" +
-                        "  }\n"+
-                        "};"
-        );
+        outputString.append("\n]};\n");
 
         return outputString;
-
     }
 
     public static StringBuilder getDateFieldModel(String sqlModel) {

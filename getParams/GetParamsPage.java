@@ -248,10 +248,10 @@ public class GetParamsPage extends com.netcracker.jsp.JsonDispatcherPage
             LOG.debug("SD = " + SD);
             LOG.debug("ED = " + ED);
 
-            Object[] tableFilter = new Object[]{SD, ED};
+            Object[] graphFilter = new Object[]{SD, ED};
             StringBuilder outputString = new StringBuilder();
 
-            outputString = KPISheetHelper.getGraphModel(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_G_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_G_DATA, tableFilter);
+            outputString = KPISheetHelper.getGraphModel(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_G_DATA, graphFilter);
             //res = KPISheetHelper.getTableModelMap(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
 
             LOG.debug("outputString="+outputString);
@@ -261,7 +261,7 @@ public class GetParamsPage extends com.netcracker.jsp.JsonDispatcherPage
             //JSONObject jsonObj = new JSONObject(res);
 
             //result.put("model", outputString.toString());
-            result.put("model", jsonObj);
+            result.put("data", jsonObj);
 
         }
         catch (Exception ex)

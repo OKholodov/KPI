@@ -6,6 +6,9 @@ var endDateComponent;
 var orderStatusTableComponent;
 var orderStatusGraphComponent;
 
+var tableLoaded;
+var graphLoaded;
+
 function pageInit() {
 	console.log("pageInit start");
 	
@@ -16,7 +19,6 @@ function pageInit() {
 	setHtmlToInfoElement("");
 	buttonRedraw();
 	drawElements();
-	
 	
 	/*
 	attachIntervalId = setInterval(function() {
@@ -193,26 +195,32 @@ function drawElements() {
 	}
 	);
 	
-	//Draw table
-	//drawTable();
-	
 	attachIntervalId = setInterval(function() {
 		//checkScriptId();
 		drawDependentElements();
 	}, 1000);
 
-
 };
 
+// Dependent from fields elements
 function drawDependentElements() {
 	if(startDateComponent && endDateComponent) {
-		drawTable();
 		drawGraph();
+		drawTable();
 		clearInterval(attachIntervalId);
+		
+		drawDependentsIntervalId = setInterval(function() {
+			if (tableLoaded == 1 && graphLoaded == 1) {
+				buttonRedraw();
+				clearInterval(drawDependentsIntervalId);
+			}
+		}, 1000);
+		
 	}
 }
 
 function drawTable() {
+	tableLoaded = 0;
 	var startDate = toFormattedDate(startDateComponent.component.value);
 	var endDate = toFormattedDate(endDateComponent.component.value);
 	console.log("Start date = " + startDate);
@@ -241,7 +249,7 @@ function drawTable() {
 				};
 				
 				if (jsonResponse) {
-					console.log("jsonResponse=" + jsonResponse);
+					//console.log("jsonResponse=" + jsonResponse);
 					jsonParse = JSON.parse(jsonResponse);
 					jsonResult = jsonParse.result;
 					
@@ -249,6 +257,7 @@ function drawTable() {
 						//console.log("exeption=" + jsonResult.exeption);
 						//setHtmlToInfoElement("Communication with server failed");
 						setHtmlToInfoElement("Communication with server failed");
+						tableLoaded = 1;
 					}
 					else {
 						tableModel = jsonResult.model;
@@ -261,8 +270,7 @@ function drawTable() {
 						newModel.model.header = header;
 						newModel.model.body = body;
 						
-						console.log("stringify newModel="+JSON.stringify(newModel));
-						
+						//console.log("stringify newModel="+JSON.stringify(newModel));
 						
 						if (orderStatusTableComponent) {
 							orderStatusTableComponent.destroy();
@@ -274,167 +282,97 @@ function drawTable() {
 				else {
 					//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
 					setHtmlToInfoElement("Communication with server failed");
+					tableLoaded = 1;
 				}
 				console.log("callback drawTable end");
-				buttonRedraw();
+				//buttonRedraw();
+				tableLoaded = 1;
 			}
 	});
 }
 
 function drawGraph() {
+	graphLoaded = 0;
 	var startDate = toFormattedDate(startDateComponent.component.value);
 	var endDate = toFormattedDate(endDateComponent.component.value);
 	console.log("Start date = " + startDate);
 	console.log("End date = " + endDate);
 	
+	var vYear = startDateComponent.component.value.getFullYear();
+	var vMonth = startDateComponent.component.value.getMonth();
+	var vDay = startDateComponent.component.value.getDate();
+
 	var graphModel = {
-           model: {
-               "chart": {
-										"type": "spline",
-										"reflow": true,
-										"className": "ux-graph",
-										"events": {
-											"load": function () {
-												
-												console.log("Graf loaded 1!");
-												console.log("test = " + Object.keys(this.series));
-												this.model = this.series.slice();
-												console.log("Graf loaded 2!");
-											}
-										}
-										//top: '80%',
-										/*
-										"scrollablePlotArea": {
-											"minWidth": "800",
-											"scrollPositionX": 1
-										}*/
-										//"width": "900"
-										//"zoomType": "XY"
-								},
-               "title": {
-                   "text": "Orders by statuses"
-               },
-               "credits": {
-                   "enabled": false
-               },
-							 "xAxis": {
-									"type": "datetime",
-									"labels": {
-											"overflow": "justify"
-									}
-									//top: '80%'
-							 },
-							 "yAxis": {
-									"title": {
-											"text": "Values"
-									}
-									//top: '80%'
-									//"minorGridLineWidth": 0,
-									//"gridLineWidth": 0
-							},
-							 "plotOptions": {
-									"spline": {
-											"lineWidth": 2,
-											"states": {
-													"hover": {
-															"lineWidth": 4
-													}
-											},
-											"marker": {
-													"enabled": false
-											},
-											"pointInterval": 1,
-											"pointIntervalUnit" : "day",
-											"pointStart": Date.UTC(2018, 1, 1)
+		 model: {
+			 "chart": {
+						"type": "spline",
+						"reflow": true,
+						//"className": "ux-graph",
+						"events": {
+							"load": function () {
+								
+								console.log("Graf loaded 1!");
+								//console.log("test = " + Object.keys(this.series));
+								//this.model = this.series.slice();
+								
+								this.reflow();
+								console.log("Graf loaded 2!");
+							}
+						}
+						//top: '80%',
+						/*
+						"scrollablePlotArea": {
+							"minWidth": "800",
+							"scrollPositionX": 1
+						}*/
+						//"width": "900"
+						//"zoomType": "XY"
+				},
+			 "title": {
+					 "text": "Orders by statuses"
+			 },
+			 "credits": {
+					 "enabled": false
+			 },
+			 "xAxis": {
+					"type": "datetime",
+					"dateTimeLabelFormats": {
+            //"day": "%e of %b %Y"
+						"day": "%e of %b"
+					},
+					"labels": {
+							"overflow": "justify"
+					}
+					//top: '80%'
+			 },
+			 "yAxis": {
+					"title": {
+							"text": "Values"
+					}
+					//top: '80%'
+					//"minorGridLineWidth": 0,
+					//"gridLineWidth": 0
+			},
+			 "plotOptions": {
+					"spline": {
+							"lineWidth": 2,
+							"states": {
+									"hover": {
+											"lineWidth": 3
 									}
 							},
-               "series": [
-									{
-										"name": "Suspended",
-										"data": [0.2, 0.8, 0.8, 0.8, 1, 1.3, 1.5, 2.9, 1.9, 2.6, 1.6, 3, 4, 3.6, 4.5, 4.2, 4.5, 4.5, 4, 3.1, 2.7, 4, 2.7, 2.3, 2.3, 4.1, 7.7, 7.1, 5.6, 6.1, 5.8, 8.6, 7.2, 9, 10.9, 11.5, 11.6, 11.1, 12, 12.3, 10.7, 9.4, 9.8, 9.6, 9.8, 9.5, 8.5, 7.4, 7.6]
-									}, {
-										"name": "Cancelled",
-										"data": [0, 0, 0.6, 0.9, 2.8, 0.2, 0, 0, 0, 0.1, 0.6, 0.7, 0.8, 0.6, 5.2, 0, 1.1, 0.3, 0.3, 0, 4.1, 0, 0, 0, 0.2, 2.1, 0, 0.3, 0, 0.1, 0.2, 0.1, 0.3, 0.3, 0, 3.1, 3.1, 2.5, 1.5, 1.9, 2.1, 1, 2.3, 1.9, 1.2, 0.7, 1.3, 0.4, 0.3]
-									},
-									{
-										"name": "Completed",
-										"data": [0, 0, 0.6, 1.9, 0.8, 0.2, 5, 0, 0, 6.1, 0.6, 0.7, 0.8, 0.6, 0.2, 0, 2.1, 0.3, 0.3, 3, 0.1, 0, 0, 0, 0.2, 3.1, 0, 0.3, 0, 0.1, 0.2, 0.1, 0.3, 0.3, 0, 3.1, 3.1, 2.5, 1.5, 1.9, 2.1, 1, 2.3, 1.9, 1.2, 0.7, 1.3, 0.4, 0.3]
-									},
-									{
-										"name": "Superseded",
-										"data": [0, 0, 1.6, 0.9, 0.8, 1.2, 0, 0, 0, 0.1, 3.6, 0.7, 0.8, 0.6, 0.2, 0, 0.1, 0.3, 0.3, 4, 0.1, 0, 0, 0, 0.2, 0.1, 0, 5.3, 0, 0.1, 6.2, 0.1, 5.3, 5.3, 0, 3.1, 3.1, 2.5, 1.5, 1.9, 2.1, 1, 2.3, 1.9, 1.2, 1.7, 1.3, 0.4, 0.3]
-									}
-							 ]/*
-							 ,
-               "navigation": {
-									"menuItemStyle": {
-											"fontSize": "10px"
-									}
-							}*/
-           }
-        };
+							"marker": {
+									"enabled": false
+							},
+							"pointInterval": 1,
+							"pointIntervalUnit" : "day",
+							"pointStart": Date.UTC(vYear, vMonth, vDay)
+					}
+			},
+			"series": {}
+		 }
+   };
 				
-				console.log("draw graph = " + graphModel);
-
- orderStatusGraphComponent = uxNg2.createComponent("#DivOrdersStatusGraph", "UxGraphComponent", graphModel);
-
-console.log("elRef = " + Object.keys(orderStatusGraphComponent.component.elRef));
-console.log("zone = " + Object.keys(orderStatusGraphComponent.component.zone));
-console.log("viewInited = " + Object.keys(orderStatusGraphComponent.component.viewInited));
-console.log("_model = " + Object.keys(orderStatusGraphComponent.component._model));
-console.log("el = " + Object.keys(orderStatusGraphComponent.component.el));
-console.log("model = " + Object.keys(orderStatusGraphComponent.component.model));
-console.log("ngAfterViewInit = " + Object.keys(orderStatusGraphComponent.component.ngAfterViewInit));
-console.log("updateGraph = " + Object.keys(orderStatusGraphComponent.component.updateGraph));
-
-
-/* <![CDATA[ */
-var chart_9150029797813261081; 
-jQuery(function () { jQuery(document).ready(function() {		try {
-			//dashboardTiming.noteWidgetParam('9150029797813261081','startJsRender');
-			//dashboardTiming.noteWidgetParam('9150029797813261081','status','success');
-			window['chart_9150029797813261081'] = new Highcharts.Chart({credits: {
-	enabled: false
-},
-"yAxis":{"min":"0","title":{"text":"","style":{"backgroundColor":"#FFFFFF"}}},"xAxis":{"title":{"text":""},"nonLocalizedCategories":["01.02.2018","01.02.2018","02.02.2018","02.02.2018","03.02.2018","03.02.2018","04.02.2018","04.02.2018","05.02.2018","05.02.2018","06.02.2018","06.02.2018","07.02.2018","07.02.2018","08.02.2018","08.02.2018","09.02.2018","09.02.2018","10.02.2018","10.02.2018"],"labels":{"tick":{"culling":{"max":null}}},"categories":["01.02.2018","01.02.2018","02.02.2018","02.02.2018","03.02.2018","03.02.2018","04.02.2018","04.02.2018","05.02.2018","05.02.2018","06.02.2018","06.02.2018","07.02.2018","07.02.2018","08.02.2018","08.02.2018","09.02.2018","09.02.2018","10.02.2018","10.02.2018"],"categoriesExtended":[[[{"localizedName":"01.02.2018","localizedLevelName":"","name":"01.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"01.02.2018","localizedLevelName":"","name":"01.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"02.02.2018","localizedLevelName":"","name":"02.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"02.02.2018","localizedLevelName":"","name":"02.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"03.02.2018","localizedLevelName":"","name":"03.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"03.02.2018","localizedLevelName":"","name":"03.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"04.02.2018","localizedLevelName":"","name":"04.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"04.02.2018","localizedLevelName":"","name":"04.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"05.02.2018","localizedLevelName":"","name":"05.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"05.02.2018","localizedLevelName":"","name":"05.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"06.02.2018","localizedLevelName":"","name":"06.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"06.02.2018","localizedLevelName":"","name":"06.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"07.02.2018","localizedLevelName":"","name":"07.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"07.02.2018","localizedLevelName":"","name":"07.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"08.02.2018","localizedLevelName":"","name":"08.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"08.02.2018","localizedLevelName":"","name":"08.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"09.02.2018","localizedLevelName":"","name":"09.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"09.02.2018","localizedLevelName":"","name":"09.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"10.02.2018","localizedLevelName":"","name":"10.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"10.02.2018","localizedLevelName":"","name":"10.02.2018","levelName":"[Measures]"}]]]},"chart":{"renderTo":"9150029797813261081","events":{"afterPrint":function () {jQuery(this.container).removeClass('CommonWidget-print-chart');this.setSize(this._oldWidth, this.chartHeight, false);},"beforePrint":function () {this._oldWidth = this.chartWidth;jQuery(this.container).addClass('CommonWidget-print-chart');this.setSize(jQuery(this.container).width(), this.chartHeight, false);},"load":function(event) {dashboardTiming.noteWidgetParam('9150029797813261081','endJsRender');if(LoadingHook){LoadingHook.suspend()};}},"type":"line"},"legend":{"enabled":true,"layout":"horizontal","align":"center","verticalAlign":"bottom"},"LevelVisualization":null,"title":{"text":""},"plotOptions":{"series":{"dataLabels":{"enabled":true},"showInLegend":true}},"dimensions":[{"localizedName":"","name":""}],"series":[{"dataName":[[{"localizedName":"Suspended","localizedLevelName":"[Measures]","name":"Suspended","levelName":"[Measures]"}]],"data":[{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":1},{"y":102},{"y":1},{"y":102}],"name":"Suspended","color":"yellow","nonLocalizedName":"Suspended"},{"dataName":[[{"localizedName":"Cancelled","localizedLevelName":"[Measures]","name":"Cancelled","levelName":"[Measures]"}]],"data":[{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":6},{"y":29},{"y":6},{"y":29}],"name":"Cancelled","color":"dodgerblue","nonLocalizedName":"Cancelled"},{"dataName":[[{"localizedName":"Completed","localizedLevelName":"[Measures]","name":"Completed","levelName":"[Measures]"}]],"data":[{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":33},{"y":47},{"y":33},{"y":47}],"name":"Completed","color":"salmon","nonLocalizedName":"Completed"},{"dataName":[[{"localizedName":"Superseded","localizedLevelName":"[Measures]","name":"Superseded","levelName":"[Measures]"}]],"data":[{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":9},{"y":41},{"y":9},{"y":41}],"name":"Superseded","color":"violet","nonLocalizedName":"Superseded"},{"dataName":[[{"localizedName":"Processing","localizedLevelName":"[Measures]","name":"Processing","levelName":"[Measures]"}]],"data":[{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":57},{"y":90},{"y":57},{"y":90}],"name":"Processing","color":"chocolate","nonLocalizedName":"Processing"}]			});
-		} catch(e) {
-			//dashboardTiming.noteWidgetParam('9150029797813261081','status','js error');
-			if(window.console && window.console.log) console.log('Error due HighCharts rendering of widgetID=9150029797813261081 : '+e.message, e);
-		}
-})});/* ]]> */
-
-//console.log("getWidth = " + orderStatusGraphComponent.component.el.getWidth());
-
-/*
-
-elRef = nativeElement
-
-zone = hasPendingMicrotasks,hasPendingMacrotasks,isStable,onUnstable,onMicrotaskEmpty,onStable,onError,_nesting,_inner,_outer,run,runGuarded,runOutsideAngular
-
-viewInited = 
-
-_model = chart,title,credits,xAxis,yAxis,plotOptions,series,navigation
-
-el = title,lang,translate,dir,dataset,hidden,tabIndex,accessKey,draggable,spellcheck,contentEditable,isContentEditable,offsetParent,offsetTop,offsetLeft,offsetWidth,offsetHeight,style,innerText,outerText,onabort,onblur,oncancel,oncanplay,oncanplaythrough,onchange,onclick,onclose,oncontextmenu,oncuechange,ondblclick,ondrag,ondragend,ondragenter,ondragleave,ondragover,ondragstart,ondrop,ondurationchange,onemptied,onended,onerror,onfocus,oninput,oninvalid,onkeydown,onkeypress,onkeyup,onload,onloadeddata,onloadedmetadata,onloadstart,onmousedown,onmouseenter,onmouseleave,onmousemove,onmouseout,onmouseover,onmouseup,onmousewheel,onpause,onplay,onplaying,onprogress,onratechange,onreset,onresize,onscroll,onseeked,onseeking,onselect,onstalled,onsubmit,onsuspend,ontimeupdate,ontoggle,onvolumechange,onwaiting,onwheel,onauxclick,ongotpointercapture,onlostpointercapture,onpointerdown,onpointermove,onpointerup,onpointercancel,onpointerover,onpointerout,onpointerenter,onpointerleave,nonce,click,focus,blur,visible,toggle,hide,show,remove,update,replace,inspect,recursivelyCollect,ancestors,descendants,firstDescendant,immediateDescendants,previousSiblings,nextSiblings,siblings,match,up,down,previous,next,getElementsBySelector,getElementsByClassName,readAttribute,getHeight,getWidth,classNames,hasClassName,addClassName,removeClassName,toggleClassName,observe,stopObserving,cleanWhitespace,empty,descendantOf,scrollTo,getStyle,getOpacity,setStyle,setOpacity,getDimensions,makePositioned,undoPositioned,makeClipping,undoClipping,childOf,childElements,Simulated,ByTag,namespaceURI,prefix,localName,tagName,id,className,classList,slot,attributes,shadowRoot,assignedSlot,innerHTML,outerHTML,scrollTop,scrollLeft,scrollWidth,scrollHeight,clientTop,clientLeft,clientWidth,clientHeight,onbeforecopy,onbeforecut,onbeforepaste,oncopy,oncut,onpaste,onsearch,onselectstart,previousElementSibling,nextElementSibling,children,firstElementChild,lastElementChild,childElementCount,onwebkitfullscreenchange,onwebkitfullscreenerror,setPointerCapture,releasePointerCapture,hasPointerCapture,hasAttributes,getAttributeNames,getAttribute,getAttributeNS,setAttribute,setAttributeNS,removeAttribute,removeAttributeNS,hasAttribute,hasAttributeNS,getAttributeNode,getAttributeNodeNS,setAttributeNode,setAttributeNodeNS,removeAttributeNode,closest,matches,webkitMatchesSelector,attachShadow,getElementsByTagName,getElementsByTagNameNS,insertAdjacentElement,insertAdjacentText,insertAdjacentHTML,requestPointerLock,getClientRects,getBoundingClientRect,scrollIntoView,scrollIntoViewIfNeeded,animate,before,after,replaceWith,prepend,append,querySelector,querySelectorAll,webkitRequestFullScreen,webkitRequestFullscreen,scroll,scrollBy,createShadowRoot,getDestinationInsertionPoints,ELEMENT_NODE,ATTRIBUTE_NODE,TEXT_NODE,CDATA_SECTION_NODE,ENTITY_REFERENCE_NODE,ENTITY_NODE,PROCESSING_INSTRUCTION_NODE,COMMENT_NODE,DOCUMENT_NODE,DOCUMENT_TYPE_NODE,DOCUMENT_FRAGMENT_NODE,NOTATION_NODE,DOCUMENT_POSITION_DISCONNECTED,DOCUMENT_POSITION_PRECEDING,DOCUMENT_POSITION_FOLLOWING,DOCUMENT_POSITION_CONTAINS,DOCUMENT_POSITION_CONTAINED_BY,DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC,nodeType,nodeName,baseURI,isConnected,ownerDocument,parentNode,parentElement,childNodes,firstChild,lastChild,previousSibling,nextSibling,nodeValue,textContent,hasChildNodes,getRootNode,normalize,cloneNode,isEqualNode,isSameNode,compareDocumentPosition,contains,lookupPrefix,lookupNamespaceURI,isDefaultNamespace,insertBefore,appendChild,replaceChild,removeChild,addEventListener,removeEventListener,dispatchEvent,__zone_symbol__addEventListener,__zone_symbol__removeEventListener,__zone_symbol__eventListeners,__zone_symbol__removeAllListeners,eventListeners,removeAllListeners
-
-offsetWidth
-scrollWidth
-clientWidth
-getWidth
-
-model = chart,title,credits,xAxis,yAxis,plotOptions,series,navigation
-
-ngAfterViewInit = bindAsEventListener
-
-updateGraph = bindAsEventListener
-
-*/
-
-//elRef,zone,viewInited,_model,el,model,ngAfterViewInit,updateGraph
-
-//orderStatusGraphComponent.setSize(1000, 1000, doAnimation = true);
-
-	/*
 	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpi/getparams.jsp',
 	{
 			method:'getGraphModel',
@@ -448,65 +386,52 @@ updateGraph = bindAsEventListener
 				var jsonResponse = json.response;
 				var jsonParse;
 				var jsonResult;
-				var tableModel;
-				
-				var newModel = {
-					model: {
-						header:{},
-						body:{}
-					}
-				};
+				var graphSeries;
 				
 				if (jsonResponse) {
-					console.log("jsonResponse=" + jsonResponse);
+					//console.log("jsonResponse=" + jsonResponse);
 					jsonParse = JSON.parse(jsonResponse);
 					jsonResult = jsonParse.result;
 					
 					if (jsonResult.exeption) {
-						//console.log("exeption=" + jsonResult.exeption);
-						//setHtmlToInfoElement("Communication with server failed");
 						setHtmlToInfoElement("Communication with server failed");
+						graphLoaded = 1;
 					}
 					else {
-						tableModel = jsonResult.model;
+						graphSeries = jsonResult.data.series;
+						//console.log("stringify graphSeries= " + JSON.stringify(graphSeries));
 						
-						//console.log("stringify ModelOrderStatus= " + JSON.stringify(ModelOrderStatus));
-
-						var header = tableModel.model.header;
-						var body = tableModel.model.body;
-
-						newModel.model.header = header;
-						newModel.model.body = body;
+						graphModel.model.series = graphSeries;
+						//console.log("stringify graphModel= " + JSON.stringify(graphModel));
 						
-						console.log("stringify newModel="+JSON.stringify(newModel));
-						
-						
-						if (orderStatusTableComponent) {
-							orderStatusTableComponent.destroy();
+						if (orderStatusGraphComponent) {
+							orderStatusGraphComponent.destroy();
 						}
-						orderStatusTableComponent = uxNg2.createComponent("#DivOrdersStatusGraph", "UxGraphComponent", newModel);
-						//orderStatusTableComponent.update();
+						orderStatusGraphComponent = uxNg2.createComponent("#DivOrdersStatusGraph", "UxGraphComponent", graphModel);
 					}
 				}
 				else {
-					//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
 					setHtmlToInfoElement("Communication with server failed");
+					graphLoaded = 1;
 				}
 				console.log("callback drawGraph end");
-				buttonRedraw();
+				//buttonRedraw();
+				graphLoaded = 1;
 			}
 	});
 	
-	*/
 }
 
-function clickButton (){
+function clickButton () {
 	console.log("clickButton start");
 	setHtmlToInfoElement("");
 	clearInterval(attachIntervalId);
-	
 	setHtmlToAttribute(getLoadingButtonHtml());
-	drawTable();
+
+
+	drawDependentElements();
+
+	
 	
 	console.log("clickButton end");
 }
