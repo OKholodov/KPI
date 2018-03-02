@@ -130,113 +130,148 @@ public class GetParamsPage extends com.netcracker.jsp.JsonDispatcherPage
         }
     }
 
-    public Map getModel(Map params) throws Exception
+    public Map getDateFieldModel(Map params) throws Exception
     {
-        LOG.debug("getModel start");
-        //Map<String, Object> result = new HashMap<String, Object>();
+        LOG.debug("getDateFieldModel start");
 
         Map<String, Object> result = new LinkedHashMap<String, Object>();
-
-        LinkedHashMap<String, LinkedHashMap<String, Object>> res = new LinkedHashMap<String, LinkedHashMap<String, Object>>();
-
-        ArrayList<BigInteger> objectIds = parseIds((String) params.get("objects"));
-        ArrayList<BigInteger> attrIds = parseIds((String) params.get("attrs"));
-        ArrayList<BigInteger> childrenTypeIds = parseIds((String) params.get("childrenTypes"));
-
-        String SD;
-        String ED;
-
-        SD = ((String) params.get("SD")).replace("\"","");
-        ED = ((String) params.get("ED")).replace("\"","");
-        LOG.debug("SD = " + SD);
-        LOG.debug("ED = " + ED);
-
-        Object[] tableFilter = new Object[]{SD, ED};
         StringBuilder outputString = new StringBuilder();
-
-        /*
-        List<KPISQLData> tableRows;
-        tableRows = KPISQLData.getData(KPISheetHelper.findSQL(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA),tableFilter);
-
-        boolean existRows = true;
-        StringBuilder outputString = new StringBuilder();
-
-        if (tableRows.size() < 1) {existRows = false;}
-
-        if (existRows) {
-            outputString.append(
-                    ", \"body\": {\n" +
-                            "    \"rows\": [\n"
-            );
-        }
-        int i = 0;
-
-        for (KPISQLData sqlData : tableRows) {
-            outputString.append(sqlData.data + "\n");
-
-            if (i < (tableRows.size() - 1)) {
-                outputString.append(", ");
-            }
-            i++;
-        }
-        */
-
-        outputString = KPISheetHelper.getTableModel(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
-
-        //res = KPISheetHelper.getTableModelMap(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
-
-        LOG.debug("outputString="+outputString);
-        LOG.debug("outputString.toString()="+outputString.toString());
-
-        JSONObject jsonObj = new JSONObject(outputString.toString());
-        //JSONObject jsonObj = new JSONObject(res);
-
-        //result.put("model", outputString.toString());
-        result.put("model", jsonObj);
+        String dateParam;
+        String sqlCode;
 
         try
         {
-            /*
-            for ( BigInteger objectId : objectIds ) {
-                NCObject obj = ILoadingService.LIGHT.findByID(objectId,
-                        attrIds.toArray(new BigInteger[attrIds.size()]) );
-//                result.put(objectId+"_name", ObjectUtils.toString(obj.getName(), ""));
-//                result.put(objectId+"_description", ObjectUtils.toString(obj.getDescription(), ""));
-//                result.put(objectId+"_type", obj.getObjectTypeID().toString() );
-                for(BigInteger attrId : attrIds)
-                {
-                    if(obj.ifParameterExists(attrId))
-                    {
-                        AttributeValue av = obj.getParameter(attrId);
-                        result.put(objectId+"_"+attrId, getValue(av) );
-                    }
-                    else {
-                        result.put(objectId+"_"+attrId, "");
-                    }
-                }
-                for(BigInteger typeId : childrenTypeIds)
-                {
-                    Collection<NCObject> children = obj.getChildren(typeId);
-                    long referenceCache = 0;
-                    for ( NCObject child : children ) {
-                        referenceCache += child.getID().longValue();
-                        referenceCache += child.getName().hashCode();
-                    }
-                    result.put(objectId+"_"+typeId, referenceCache + "");
-                }
+            dateParam = (String) params.get("DATE");
+            LOG.debug("dateParam="+dateParam);
+
+            if ("SD".equals(dateParam)) {
+                sqlCode = KPISheetHelper.SQLFILE_GET_START_DATE_DATA;
             }
-            */
+            else if ("ED".equals(dateParam)) {
+                sqlCode = KPISheetHelper.SQLFILE_GET_END_DATE_DATA;
+            }
+            else {
+                LOG.debug("dateParam wasnt recognized");
+                result.put("exeption", "dateParam wasnt recognized:"+dateParam);
+                return result;
+            }
+
+            outputString = KPISheetHelper.getDateFieldModel(sqlCode);
+
+            LOG.debug("outputString="+outputString);
+            LOG.debug("outputString.toString()="+outputString.toString());
+
+            JSONObject jsonObj = new JSONObject(outputString.toString());
+            //JSONObject jsonObj = new JSONObject(res);
+
+            //result.put("model", outputString.toString());
+            result.put("model", jsonObj);
+
         }
         catch (Exception ex)
         {
-            LOG.debug("getModel ex");
-            result.put("text", ex.getMessage());
+            LOG.debug("getDateFieldModel Exception = " + ex.getMessage());
+            result.put("exeption", ex.getMessage());
         }
         finally
         {
-            LOG.debug("log.isTraceEnabled()="+log.isTraceEnabled());
-            if(log.isTraceEnabled()) log.trace("result=" + result);
-            LOG.debug("result123= "+result);
+            LOG.debug("resultJson from getDateFieldModel = " + result);
+            return result;
+        }
+    }
+
+    public Map getTableModel(Map params) throws Exception
+    {
+        LOG.debug("getTableModel start");
+        //Map<String, Object> result = new HashMap<String, Object>();
+
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        String SD;
+        String ED;
+
+        //LinkedHashMap<String, LinkedHashMap<String, Object>> res = new LinkedHashMap<String, LinkedHashMap<String, Object>>();
+
+        /*
+        ArrayList<BigInteger> objectIds = parseIds((String) params.get("objects"));
+        ArrayList<BigInteger> attrIds = parseIds((String) params.get("attrs"));
+        ArrayList<BigInteger> childrenTypeIds = parseIds((String) params.get("childrenTypes"));
+        */
+
+        try
+        {
+            SD = ((String) params.get("SD")).replace("\"","");
+            ED = ((String) params.get("ED")).replace("\"","");
+            LOG.debug("SD = " + SD);
+            LOG.debug("ED = " + ED);
+
+            Object[] tableFilter = new Object[]{SD, ED};
+            StringBuilder outputString = new StringBuilder();
+
+            outputString = KPISheetHelper.getTableModel(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
+            //res = KPISheetHelper.getTableModelMap(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
+
+            LOG.debug("outputString="+outputString);
+            LOG.debug("outputString.toString()="+outputString.toString());
+
+            JSONObject jsonObj = new JSONObject(outputString.toString());
+            //JSONObject jsonObj = new JSONObject(res);
+
+            //result.put("model", outputString.toString());
+            result.put("model", jsonObj);
+
+        }
+        catch (Exception ex)
+        {
+            LOG.debug("getTableModel Exception = " + ex.getMessage());
+            result.put("exeption", ex.getMessage());
+        }
+        finally
+        {
+            LOG.debug("resultJson from getTableModel = " + result);
+            return result;
+        }
+    }
+
+    public Map getGraphModel(Map params) throws Exception
+    {
+        LOG.debug("getGraphModel start");
+        //Map<String, Object> result = new HashMap<String, Object>();
+
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        String SD;
+        String ED;
+
+        try
+        {
+            SD = ((String) params.get("SD")).replace("\"","");
+            ED = ((String) params.get("ED")).replace("\"","");
+            LOG.debug("SD = " + SD);
+            LOG.debug("ED = " + ED);
+
+            Object[] tableFilter = new Object[]{SD, ED};
+            StringBuilder outputString = new StringBuilder();
+
+            outputString = KPISheetHelper.getGraphModel(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_G_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_G_DATA, tableFilter);
+            //res = KPISheetHelper.getTableModelMap(KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, KPISheetHelper.SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
+
+            LOG.debug("outputString="+outputString);
+            LOG.debug("outputString.toString()="+outputString.toString());
+
+            JSONObject jsonObj = new JSONObject(outputString.toString());
+            //JSONObject jsonObj = new JSONObject(res);
+
+            //result.put("model", outputString.toString());
+            result.put("model", jsonObj);
+
+        }
+        catch (Exception ex)
+        {
+            LOG.debug("getGraphModel Exception = " + ex.getMessage());
+            result.put("exeption", ex.getMessage());
+        }
+        finally
+        {
+            LOG.debug("resultJson from getGraphModel = " + result);
             return result;
         }
     }

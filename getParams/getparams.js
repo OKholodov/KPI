@@ -1,32 +1,31 @@
-var attachValues;
 var KPIScriptId; 
 var attachIntervalId;
 
-function attachInit() {
+var startDateComponent;
+var endDateComponent;
+var orderStatusTableComponent;
+var orderStatusGraphComponent;
 
-	var valuesJson = document.getElementById('KPIButtonContent').innerText;
+function pageInit() {
+	console.log("pageInit start");
+	
+	//var valuesJson = document.getElementById('KPIButtonContent').innerText;
 	var visual = "";
-	if(valuesJson) {
-		attachValues = JSON.parse(valuesJson);
-	}
-	console.log("attachInit 1");
-	checkScriptId();
-	console.log("attachInit 2");
-	attachCheckExpired();
-	console.log("attachInit 3");
+
+	//checkScriptId();
+	setHtmlToInfoElement("");
+	buttonRedraw();
+	drawElements();
 	
-	attachRedraw();
-	console.log("attachInit 4");
 	
+	/*
 	attachIntervalId = setInterval(function() {
 		checkScriptId();
-		attachCheckExpired();
-		attachRedraw();		
+		buttonRedraw();		
 	}, 5000);
-	console.log("attachInit 5");
-	
-	checkRefreshObjects();
-	
+	*/
+
+	console.log("pageInit end");
 }
 
 function checkScriptId() {
@@ -35,7 +34,6 @@ function checkScriptId() {
 		if(KPIScriptId) {
 			if(KPIScriptId != uid) {
 				KPIScriptId = uid;
-				getUpdatedValue();
 			}
 		} else {
 			KPIScriptId = uid;
@@ -46,27 +44,8 @@ function checkScriptId() {
 	}
 }
 
-function attachCheckExpired() {
-	if(attachValues) {
-		var attachVal = attachValues.values;
-		var now = new Date();
-		now.setSeconds(now.getSeconds() +5);
-		var newAttachVal = attachVal.filter(function(el){
-			return el.expiredDate && new Date(el.expiredDate) > now;
-		});
-		attachValues.values = newAttachVal;
-	}
-}
-
-function attachRedraw() {
+function buttonRedraw() {
 	var visual = "";
-	if(attachValues) {
-		var attachVal = attachValues.values;
-		for(var i = 0; i < attachVal.length; i++) {
-			visual += parseLink(attachVal[i]);
-			visual += "<br/>";
-		}
-	}
 	visual += getButtonHtml();
 	setHtmlToAttribute(visual);
 }
@@ -119,268 +98,485 @@ function toReadable(date) {
 	return res;
 }
 
-function getFindDialog(){
-	console.log("getFindDialog start");
-	//Get context objects
-	//var ctxObjs=document.getElementById("context_objects").value;
-	var id = '9148769416513465926';
-	
-	new Ajax.RemoteCallJSON('/solutions/titalia/sparkle/kpi/getparams.jsp', {
-	    method: 'getFindDialog',
-	    parameters: {context_objects: id},
-	    onResult: function( json ) {
-	       //printDialog(json);
-				 console.log("fuuuunc");
-	    }
-	} );
-	
-	console.log("getFindDialog end");
-	
-}
-
 /* Returns date in format DD.MM.YYYY */
 function toFormattedDate(vdate) {
 	var resDate = vdate.getDate().toString().replace(/^([0-9])$/, '0$1') + '.' + (vdate.getMonth() + 1).toString().replace(/^([0-9])$/, '0$1') + '.' + vdate.getFullYear();
 	return resDate;
 }
 
-function checkRefreshObjects()
-{
-console.log("checkRefreshObjects start");
+function drawElements() {
 
-var startDateComponent = varStartDate.component.value;
-var endDateComponent = varEndDate.component.value;
+	console.log("drawElements start");
 
-//var startDate = startDateComponent.getDate().toString().replace(/^([0-9])$/, '0$1') + '.' + (startDateComponent.getMonth() + 1).toString().replace(/^([0-9])$/, '0$1') + '.' + startDateComponent.getFullYear();
-//var endDate = endDateComponent.getDate().toString().replace(/^([0-9])$/, '0$1') + '.' + (endDateComponent.getMonth() + 1).toString().replace(/^([0-9])$/, '0$1') + '.' + endDateComponent.getFullYear();
+	// Draw start date field
+	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpi/getparams.jsp',
+	{
+			method:'getDateFieldModel',
+			parameters: {
+					DATE: "SD"
+			},
+			onSuccess: function(json) {
+				console.log("drawElements StartDate onSuccess!");
+				var jsonResponse = json.response;
 
-var startDate = toFormattedDate(startDateComponent);
-var endDate = toFormattedDate(endDateComponent);
-
-console.log("Start date = " + startDate);
-console.log("End date = " + endDate);
-
-var check_refresh_object_ids = new Array();
-var check_refresh_attr_ids = new Array();
-var check_refresh_children_type_ids = new Array();
-
-	check_refresh_object_ids[check_refresh_object_ids.length] = "9148769416513465926";
-	check_refresh_attr_ids[check_refresh_attr_ids.length] = "61";
-	check_refresh_children_type_ids[check_refresh_children_type_ids.length] = "7121158695013985788";
-
-/*
-var check_refresh_object_ids;
-var check_refresh_attr_ids;
-var check_refresh_children_type_ids;
-
-	check_refresh_object_ids = '9148769416513465926';
-	check_refresh_attr_ids = '61';
-	check_refresh_children_type_ids = '7121158695013985788';
-*/
-	console.log("check_refresh_object_ids.toJSON()="+check_refresh_object_ids.toJSON());
-	console.log("check_refresh_attr_ids.toJSON()="+check_refresh_attr_ids.toJSON());
-	console.log("check_refresh_children_type_ids.toJSON()="+check_refresh_children_type_ids.toJSON());
-	
-    //if (!isRefreshStoped) {
-        //new Ajax.RemoteCallJSON('/solutions/titalia/sparkle/kpi/getparams.jsp?requesttype=polling',
-				new /*window.*/Ajax.RemoteCallJSON /*simpleAjaxCallJSON*/('/solutions/titalia/sparkle/kpi/getparams.jsp',
-        {
-            method:'getModel',
-            parameters: {
-                objects: check_refresh_object_ids.toJSON(),
-                attrs: check_refresh_attr_ids.toJSON(),
-                childrenTypes: check_refresh_children_type_ids.toJSON(),
-								SD: startDate.toJSON(),
-								ED: endDate.toJSON()
-            },
-						/*onError: callbackError,
-						onFailure: callbackFailure,*/
-						onResult: customFunc,
-						onSuccess: callbackSuccess
-        });
-    //}
-		console.log("checkRefreshObjects end");
-}
-
-function callbackError(json) {
-	console.log("callbackError!");
-}
-function callbackFailure(json) {
-	console.log("callbackFailure!");
-	console.log(json);
-	console.log("callbackFailure after");
-}
-
-function customFunc(json) {
-	console.log("customFunc!");
-	console.log(json);
-}
-function callbackSuccess(json) {
-	console.log("callbackSuccess!");
-	
-	var result = json.response;
-	var jsonVal;
-	var jsonResult;
-	var tableModel;
-	var newTableModel;
-	
-	var ModelOrderStatus1;
-	
-	var model = {
-		model: {
-			header:{},
-			body:{}
-		}
-	};
-	
-	if (result) {
-		jsonVal = JSON.parse(result);
-		jsonResult = jsonVal.result;
-		//console.log("jsonVal = " + jsonVal);
-		//console.log("stringify = " + JSON.stringify(jsonVal));
-		//console.log("jsonResult = " + jsonResult);
-		
-		tableModel = jsonResult.model;
-		console.log("jsonResult = " + tableModel);
-		//console.log("tableModel.keys = " + Object.keys(tableModel));
-		//console.log("ModelOrderStatus.keys = " + Object.keys(ModelOrderStatus));
-		
-		//console.log("tableModel.model.keys = " + Object.keys(tableModel.model));
-		//console.log("ModelOrderStatus.model.keys = " + Object.keys(ModelOrderStatus.model));
-		
-		//console.log("stringify tableModel= " + JSON.stringify(tableModel));
-		console.log("stringify ModelOrderStatus= " + JSON.stringify(ModelOrderStatus));
-		
-		//console.log("isArray tableModel" + Array.isArray(tableModel));
-		//console.log("isArray ModelOrderStatus" + Array.isArray(ModelOrderStatus));
-		
-
-		var header = tableModel.model.header;
-		//console.log("stringify header="+JSON.stringify(header));
-		var body = tableModel.model.body;
-		//console.log("stringify body="+JSON.stringify(body));
-		
-		model.model.header = header;
-		model.model.body = body;
-		
-		console.log("stringify model="+JSON.stringify(model));
-		//newTableModel = header.concat(body);
-		
-		//newTableModel = $.extend( true, header, body );
-		//var NewObject = $.extend({},body , header);
-		/*
-		$.extend(body,header);
-		console.log("333");
-		
-		console.log("stringify body= " + JSON.stringify(body));
-		console.log("stringify header= " + JSON.stringify(header));
-		*/
-		//console.log("new model=" + NewObject);
-		//console.log("stringify new tableModel= " + JSON.stringify(NewObject));
-		/*
-		console.log("typeof = " + typeof tableModel);
-		
-		console.log("typeof = " + typeof ModelOrderStatus);
-		*/
-/*
-		console.log("instanceof = " + tableModel instanceof JSON); 
-		console.log("constructor.name = " + tableModel.constructor.name);   
-		console.log("name = " + tableModel.name);               
-
-		*/
-		/*
-		ModelOrderStatus1 = tableModel;
-		
-		console.log("1");
-		
-		//var tmp = JSON.parse(tableModel);
-		
-		console.log("2");
-		
-		//console.log("tmp = " + tmp);
-		*/
-		
-		//component.component.model = model;
-		//component.update();
-		//var component1 = uxNg2.createComponent("#DivTestTable", "UxTableComponent", model);
-		
-		component.destroy();
-		component = uxNg2.createComponent("#OrderStatus", "UxTableComponent", model);
-		
-		/*
-		var keys = Object.keys(component1);
-		var keysComp = Object.keys(component1.component.getCurrentTableData());
-		
-		//component1.component.model = ModelOrderStatus1;
-		
-		console.log("component1 = " + keys);
-		console.log("component2 = " + keysComp);
-		
-		//component1.destroy();
-		
-		component1.update();
-*/
-		
-		
-		
-		//component.component.model = tableModel;
-		//component.component.update();
-		
+				if (jsonResponse) {
+					var jsonParse = JSON.parse(jsonResponse);
+					var jsonResult = jsonParse.result;
+					if (jsonResult.exeption) {
+						//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
+						//console.log("jsonResult.exeption="+jsonResult.exeption);
+						setHtmlToInfoElement("Communication with server failed");
+					}
+					else {
+						var sdFieldModel = jsonResult.model;
+						
+						console.log("stringify sdFieldModel="+JSON.stringify(sdFieldModel));
+						
+						if (startDateComponent) {
+							startDateComponent.destroy();
+						}
+						else {
+							startDateComponent = uxNg2.createComponent("#DivStartDate", "UxDateFieldComponent", sdFieldModel);
+							//console.log("startDateComponent= " + startDateComponent);
+						}
+						
+					}
+				}
+				else {
+					//setHtmlToAttribute(getButtonHtml()+" Communication with server failed.");
+					setHtmlToInfoElement("Communication with server failed");
+				}
+				
+			}
 	}
-	console.log("callbackSuccess after");
+	);
+	
+	// Draw end date field
+	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpi/getparams.jsp',
+	{
+			method:'getDateFieldModel',
+			parameters: {
+					DATE: "ED"
+			},
+			onSuccess: function(json) {
+				console.log("drawElements EndDate onSuccess!");
+				var jsonResponse = json.response;
+
+				if (jsonResponse) {
+					var jsonParse = JSON.parse(jsonResponse);
+					var jsonResult = jsonParse.result;
+					if (jsonResult.exeption) {
+						//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
+						//console.log("jsonResult.exeption="+jsonResult.exeption);
+						setHtmlToInfoElement("Communication with server failed");
+					}
+					else {
+						var edFieldModel = jsonResult.model;
+						
+						console.log("stringify edFieldModel="+JSON.stringify(edFieldModel));
+						
+						if (endDateComponent) {
+							endDateComponent.destroy();
+						}
+						else {
+							endDateComponent = uxNg2.createComponent("#DivEndDate", "UxDateFieldComponent", edFieldModel);
+						}
+						
+					}
+				}
+				else {
+					//setHtmlToAttribute(getButtonHtml()+" Communication with server failed.");
+					setHtmlToInfoElement("Communication with server failed");
+				}
+				
+			}
+	}
+	);
+	
+	//Draw table
+	//drawTable();
+	
+	attachIntervalId = setInterval(function() {
+		//checkScriptId();
+		drawDependentElements();
+	}, 1000);
+
+
+};
+
+function drawDependentElements() {
+	if(startDateComponent && endDateComponent) {
+		drawTable();
+		drawGraph();
+		clearInterval(attachIntervalId);
+	}
+}
+
+function drawTable() {
+	var startDate = toFormattedDate(startDateComponent.component.value);
+	var endDate = toFormattedDate(endDateComponent.component.value);
+	console.log("Start date = " + startDate);
+	console.log("End date = " + endDate);
+
+	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpi/getparams.jsp',
+	{
+			method:'getTableModel',
+			parameters: {
+					SD: startDate.toJSON(),
+					ED: endDate.toJSON()
+			},
+			onSuccess: function(json) {
+				console.log("Callback drawTable start!");
+				
+				var jsonResponse = json.response;
+				var jsonParse;
+				var jsonResult;
+				var tableModel;
+				
+				var newModel = {
+					model: {
+						header:{},
+						body:{}
+					}
+				};
+				
+				if (jsonResponse) {
+					console.log("jsonResponse=" + jsonResponse);
+					jsonParse = JSON.parse(jsonResponse);
+					jsonResult = jsonParse.result;
+					
+					if (jsonResult.exeption) {
+						//console.log("exeption=" + jsonResult.exeption);
+						//setHtmlToInfoElement("Communication with server failed");
+						setHtmlToInfoElement("Communication with server failed");
+					}
+					else {
+						tableModel = jsonResult.model;
+						
+						//console.log("stringify ModelOrderStatus= " + JSON.stringify(ModelOrderStatus));
+
+						var header = tableModel.model.header;
+						var body = tableModel.model.body;
+
+						newModel.model.header = header;
+						newModel.model.body = body;
+						
+						console.log("stringify newModel="+JSON.stringify(newModel));
+						
+						
+						if (orderStatusTableComponent) {
+							orderStatusTableComponent.destroy();
+						}
+						orderStatusTableComponent = uxNg2.createComponent("#DivOrdersStatusTable", "UxTableComponent", newModel);
+						//orderStatusTableComponent.update();
+					}
+				}
+				else {
+					//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
+					setHtmlToInfoElement("Communication with server failed");
+				}
+				console.log("callback drawTable end");
+				buttonRedraw();
+			}
+	});
+}
+
+function drawGraph() {
+	var startDate = toFormattedDate(startDateComponent.component.value);
+	var endDate = toFormattedDate(endDateComponent.component.value);
+	console.log("Start date = " + startDate);
+	console.log("End date = " + endDate);
+	
+	var graphModel = {
+           model: {
+               "chart": {
+										"type": "spline",
+										"reflow": true,
+										"className": "ux-graph",
+										"events": {
+											"load": function () {
+												
+												console.log("Graf loaded 1!");
+												console.log("test = " + Object.keys(this.series));
+												this.model = this.series.slice();
+												console.log("Graf loaded 2!");
+											}
+										}
+										//top: '80%',
+										/*
+										"scrollablePlotArea": {
+											"minWidth": "800",
+											"scrollPositionX": 1
+										}*/
+										//"width": "900"
+										//"zoomType": "XY"
+								},
+               "title": {
+                   "text": "Orders by statuses"
+               },
+               "credits": {
+                   "enabled": false
+               },
+							 "xAxis": {
+									"type": "datetime",
+									"labels": {
+											"overflow": "justify"
+									}
+									//top: '80%'
+							 },
+							 "yAxis": {
+									"title": {
+											"text": "Values"
+									}
+									//top: '80%'
+									//"minorGridLineWidth": 0,
+									//"gridLineWidth": 0
+							},
+							 "plotOptions": {
+									"spline": {
+											"lineWidth": 2,
+											"states": {
+													"hover": {
+															"lineWidth": 4
+													}
+											},
+											"marker": {
+													"enabled": false
+											},
+											"pointInterval": 1,
+											"pointIntervalUnit" : "day",
+											"pointStart": Date.UTC(2018, 1, 1)
+									}
+							},
+               "series": [
+									{
+										"name": "Suspended",
+										"data": [0.2, 0.8, 0.8, 0.8, 1, 1.3, 1.5, 2.9, 1.9, 2.6, 1.6, 3, 4, 3.6, 4.5, 4.2, 4.5, 4.5, 4, 3.1, 2.7, 4, 2.7, 2.3, 2.3, 4.1, 7.7, 7.1, 5.6, 6.1, 5.8, 8.6, 7.2, 9, 10.9, 11.5, 11.6, 11.1, 12, 12.3, 10.7, 9.4, 9.8, 9.6, 9.8, 9.5, 8.5, 7.4, 7.6]
+									}, {
+										"name": "Cancelled",
+										"data": [0, 0, 0.6, 0.9, 2.8, 0.2, 0, 0, 0, 0.1, 0.6, 0.7, 0.8, 0.6, 5.2, 0, 1.1, 0.3, 0.3, 0, 4.1, 0, 0, 0, 0.2, 2.1, 0, 0.3, 0, 0.1, 0.2, 0.1, 0.3, 0.3, 0, 3.1, 3.1, 2.5, 1.5, 1.9, 2.1, 1, 2.3, 1.9, 1.2, 0.7, 1.3, 0.4, 0.3]
+									},
+									{
+										"name": "Completed",
+										"data": [0, 0, 0.6, 1.9, 0.8, 0.2, 5, 0, 0, 6.1, 0.6, 0.7, 0.8, 0.6, 0.2, 0, 2.1, 0.3, 0.3, 3, 0.1, 0, 0, 0, 0.2, 3.1, 0, 0.3, 0, 0.1, 0.2, 0.1, 0.3, 0.3, 0, 3.1, 3.1, 2.5, 1.5, 1.9, 2.1, 1, 2.3, 1.9, 1.2, 0.7, 1.3, 0.4, 0.3]
+									},
+									{
+										"name": "Superseded",
+										"data": [0, 0, 1.6, 0.9, 0.8, 1.2, 0, 0, 0, 0.1, 3.6, 0.7, 0.8, 0.6, 0.2, 0, 0.1, 0.3, 0.3, 4, 0.1, 0, 0, 0, 0.2, 0.1, 0, 5.3, 0, 0.1, 6.2, 0.1, 5.3, 5.3, 0, 3.1, 3.1, 2.5, 1.5, 1.9, 2.1, 1, 2.3, 1.9, 1.2, 1.7, 1.3, 0.4, 0.3]
+									}
+							 ]/*
+							 ,
+               "navigation": {
+									"menuItemStyle": {
+											"fontSize": "10px"
+									}
+							}*/
+           }
+        };
+				
+				console.log("draw graph = " + graphModel);
+
+ orderStatusGraphComponent = uxNg2.createComponent("#DivOrdersStatusGraph", "UxGraphComponent", graphModel);
+
+console.log("elRef = " + Object.keys(orderStatusGraphComponent.component.elRef));
+console.log("zone = " + Object.keys(orderStatusGraphComponent.component.zone));
+console.log("viewInited = " + Object.keys(orderStatusGraphComponent.component.viewInited));
+console.log("_model = " + Object.keys(orderStatusGraphComponent.component._model));
+console.log("el = " + Object.keys(orderStatusGraphComponent.component.el));
+console.log("model = " + Object.keys(orderStatusGraphComponent.component.model));
+console.log("ngAfterViewInit = " + Object.keys(orderStatusGraphComponent.component.ngAfterViewInit));
+console.log("updateGraph = " + Object.keys(orderStatusGraphComponent.component.updateGraph));
+
+
+/* <![CDATA[ */
+var chart_9150029797813261081; 
+jQuery(function () { jQuery(document).ready(function() {		try {
+			//dashboardTiming.noteWidgetParam('9150029797813261081','startJsRender');
+			//dashboardTiming.noteWidgetParam('9150029797813261081','status','success');
+			window['chart_9150029797813261081'] = new Highcharts.Chart({credits: {
+	enabled: false
+},
+"yAxis":{"min":"0","title":{"text":"","style":{"backgroundColor":"#FFFFFF"}}},"xAxis":{"title":{"text":""},"nonLocalizedCategories":["01.02.2018","01.02.2018","02.02.2018","02.02.2018","03.02.2018","03.02.2018","04.02.2018","04.02.2018","05.02.2018","05.02.2018","06.02.2018","06.02.2018","07.02.2018","07.02.2018","08.02.2018","08.02.2018","09.02.2018","09.02.2018","10.02.2018","10.02.2018"],"labels":{"tick":{"culling":{"max":null}}},"categories":["01.02.2018","01.02.2018","02.02.2018","02.02.2018","03.02.2018","03.02.2018","04.02.2018","04.02.2018","05.02.2018","05.02.2018","06.02.2018","06.02.2018","07.02.2018","07.02.2018","08.02.2018","08.02.2018","09.02.2018","09.02.2018","10.02.2018","10.02.2018"],"categoriesExtended":[[[{"localizedName":"01.02.2018","localizedLevelName":"","name":"01.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"01.02.2018","localizedLevelName":"","name":"01.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"02.02.2018","localizedLevelName":"","name":"02.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"02.02.2018","localizedLevelName":"","name":"02.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"03.02.2018","localizedLevelName":"","name":"03.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"03.02.2018","localizedLevelName":"","name":"03.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"04.02.2018","localizedLevelName":"","name":"04.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"04.02.2018","localizedLevelName":"","name":"04.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"05.02.2018","localizedLevelName":"","name":"05.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"05.02.2018","localizedLevelName":"","name":"05.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"06.02.2018","localizedLevelName":"","name":"06.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"06.02.2018","localizedLevelName":"","name":"06.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"07.02.2018","localizedLevelName":"","name":"07.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"07.02.2018","localizedLevelName":"","name":"07.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"08.02.2018","localizedLevelName":"","name":"08.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"08.02.2018","localizedLevelName":"","name":"08.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"09.02.2018","localizedLevelName":"","name":"09.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"09.02.2018","localizedLevelName":"","name":"09.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"10.02.2018","localizedLevelName":"","name":"10.02.2018","levelName":"[Measures]"}]],[[{"localizedName":"10.02.2018","localizedLevelName":"","name":"10.02.2018","levelName":"[Measures]"}]]]},"chart":{"renderTo":"9150029797813261081","events":{"afterPrint":function () {jQuery(this.container).removeClass('CommonWidget-print-chart');this.setSize(this._oldWidth, this.chartHeight, false);},"beforePrint":function () {this._oldWidth = this.chartWidth;jQuery(this.container).addClass('CommonWidget-print-chart');this.setSize(jQuery(this.container).width(), this.chartHeight, false);},"load":function(event) {dashboardTiming.noteWidgetParam('9150029797813261081','endJsRender');if(LoadingHook){LoadingHook.suspend()};}},"type":"line"},"legend":{"enabled":true,"layout":"horizontal","align":"center","verticalAlign":"bottom"},"LevelVisualization":null,"title":{"text":""},"plotOptions":{"series":{"dataLabels":{"enabled":true},"showInLegend":true}},"dimensions":[{"localizedName":"","name":""}],"series":[{"dataName":[[{"localizedName":"Suspended","localizedLevelName":"[Measures]","name":"Suspended","levelName":"[Measures]"}]],"data":[{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":102},{"y":1},{"y":1},{"y":102},{"y":1},{"y":102}],"name":"Suspended","color":"yellow","nonLocalizedName":"Suspended"},{"dataName":[[{"localizedName":"Cancelled","localizedLevelName":"[Measures]","name":"Cancelled","levelName":"[Measures]"}]],"data":[{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":29},{"y":6},{"y":6},{"y":29},{"y":6},{"y":29}],"name":"Cancelled","color":"dodgerblue","nonLocalizedName":"Cancelled"},{"dataName":[[{"localizedName":"Completed","localizedLevelName":"[Measures]","name":"Completed","levelName":"[Measures]"}]],"data":[{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":47},{"y":33},{"y":33},{"y":47},{"y":33},{"y":47}],"name":"Completed","color":"salmon","nonLocalizedName":"Completed"},{"dataName":[[{"localizedName":"Superseded","localizedLevelName":"[Measures]","name":"Superseded","levelName":"[Measures]"}]],"data":[{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":41},{"y":9},{"y":9},{"y":41},{"y":9},{"y":41}],"name":"Superseded","color":"violet","nonLocalizedName":"Superseded"},{"dataName":[[{"localizedName":"Processing","localizedLevelName":"[Measures]","name":"Processing","levelName":"[Measures]"}]],"data":[{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":90},{"y":57},{"y":57},{"y":90},{"y":57},{"y":90}],"name":"Processing","color":"chocolate","nonLocalizedName":"Processing"}]			});
+		} catch(e) {
+			//dashboardTiming.noteWidgetParam('9150029797813261081','status','js error');
+			if(window.console && window.console.log) console.log('Error due HighCharts rendering of widgetID=9150029797813261081 : '+e.message, e);
+		}
+})});/* ]]> */
+
+//console.log("getWidth = " + orderStatusGraphComponent.component.el.getWidth());
+
+/*
+
+elRef = nativeElement
+
+zone = hasPendingMicrotasks,hasPendingMacrotasks,isStable,onUnstable,onMicrotaskEmpty,onStable,onError,_nesting,_inner,_outer,run,runGuarded,runOutsideAngular
+
+viewInited = 
+
+_model = chart,title,credits,xAxis,yAxis,plotOptions,series,navigation
+
+el = title,lang,translate,dir,dataset,hidden,tabIndex,accessKey,draggable,spellcheck,contentEditable,isContentEditable,offsetParent,offsetTop,offsetLeft,offsetWidth,offsetHeight,style,innerText,outerText,onabort,onblur,oncancel,oncanplay,oncanplaythrough,onchange,onclick,onclose,oncontextmenu,oncuechange,ondblclick,ondrag,ondragend,ondragenter,ondragleave,ondragover,ondragstart,ondrop,ondurationchange,onemptied,onended,onerror,onfocus,oninput,oninvalid,onkeydown,onkeypress,onkeyup,onload,onloadeddata,onloadedmetadata,onloadstart,onmousedown,onmouseenter,onmouseleave,onmousemove,onmouseout,onmouseover,onmouseup,onmousewheel,onpause,onplay,onplaying,onprogress,onratechange,onreset,onresize,onscroll,onseeked,onseeking,onselect,onstalled,onsubmit,onsuspend,ontimeupdate,ontoggle,onvolumechange,onwaiting,onwheel,onauxclick,ongotpointercapture,onlostpointercapture,onpointerdown,onpointermove,onpointerup,onpointercancel,onpointerover,onpointerout,onpointerenter,onpointerleave,nonce,click,focus,blur,visible,toggle,hide,show,remove,update,replace,inspect,recursivelyCollect,ancestors,descendants,firstDescendant,immediateDescendants,previousSiblings,nextSiblings,siblings,match,up,down,previous,next,getElementsBySelector,getElementsByClassName,readAttribute,getHeight,getWidth,classNames,hasClassName,addClassName,removeClassName,toggleClassName,observe,stopObserving,cleanWhitespace,empty,descendantOf,scrollTo,getStyle,getOpacity,setStyle,setOpacity,getDimensions,makePositioned,undoPositioned,makeClipping,undoClipping,childOf,childElements,Simulated,ByTag,namespaceURI,prefix,localName,tagName,id,className,classList,slot,attributes,shadowRoot,assignedSlot,innerHTML,outerHTML,scrollTop,scrollLeft,scrollWidth,scrollHeight,clientTop,clientLeft,clientWidth,clientHeight,onbeforecopy,onbeforecut,onbeforepaste,oncopy,oncut,onpaste,onsearch,onselectstart,previousElementSibling,nextElementSibling,children,firstElementChild,lastElementChild,childElementCount,onwebkitfullscreenchange,onwebkitfullscreenerror,setPointerCapture,releasePointerCapture,hasPointerCapture,hasAttributes,getAttributeNames,getAttribute,getAttributeNS,setAttribute,setAttributeNS,removeAttribute,removeAttributeNS,hasAttribute,hasAttributeNS,getAttributeNode,getAttributeNodeNS,setAttributeNode,setAttributeNodeNS,removeAttributeNode,closest,matches,webkitMatchesSelector,attachShadow,getElementsByTagName,getElementsByTagNameNS,insertAdjacentElement,insertAdjacentText,insertAdjacentHTML,requestPointerLock,getClientRects,getBoundingClientRect,scrollIntoView,scrollIntoViewIfNeeded,animate,before,after,replaceWith,prepend,append,querySelector,querySelectorAll,webkitRequestFullScreen,webkitRequestFullscreen,scroll,scrollBy,createShadowRoot,getDestinationInsertionPoints,ELEMENT_NODE,ATTRIBUTE_NODE,TEXT_NODE,CDATA_SECTION_NODE,ENTITY_REFERENCE_NODE,ENTITY_NODE,PROCESSING_INSTRUCTION_NODE,COMMENT_NODE,DOCUMENT_NODE,DOCUMENT_TYPE_NODE,DOCUMENT_FRAGMENT_NODE,NOTATION_NODE,DOCUMENT_POSITION_DISCONNECTED,DOCUMENT_POSITION_PRECEDING,DOCUMENT_POSITION_FOLLOWING,DOCUMENT_POSITION_CONTAINS,DOCUMENT_POSITION_CONTAINED_BY,DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC,nodeType,nodeName,baseURI,isConnected,ownerDocument,parentNode,parentElement,childNodes,firstChild,lastChild,previousSibling,nextSibling,nodeValue,textContent,hasChildNodes,getRootNode,normalize,cloneNode,isEqualNode,isSameNode,compareDocumentPosition,contains,lookupPrefix,lookupNamespaceURI,isDefaultNamespace,insertBefore,appendChild,replaceChild,removeChild,addEventListener,removeEventListener,dispatchEvent,__zone_symbol__addEventListener,__zone_symbol__removeEventListener,__zone_symbol__eventListeners,__zone_symbol__removeAllListeners,eventListeners,removeAllListeners
+
+offsetWidth
+scrollWidth
+clientWidth
+getWidth
+
+model = chart,title,credits,xAxis,yAxis,plotOptions,series,navigation
+
+ngAfterViewInit = bindAsEventListener
+
+updateGraph = bindAsEventListener
+
+*/
+
+//elRef,zone,viewInited,_model,el,model,ngAfterViewInit,updateGraph
+
+//orderStatusGraphComponent.setSize(1000, 1000, doAnimation = true);
+
+	/*
+	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpi/getparams.jsp',
+	{
+			method:'getGraphModel',
+			parameters: {
+					SD: startDate.toJSON(),
+					ED: endDate.toJSON()
+			},
+			onSuccess: function(json) {
+				console.log("Callback drawGraph start!");
+				
+				var jsonResponse = json.response;
+				var jsonParse;
+				var jsonResult;
+				var tableModel;
+				
+				var newModel = {
+					model: {
+						header:{},
+						body:{}
+					}
+				};
+				
+				if (jsonResponse) {
+					console.log("jsonResponse=" + jsonResponse);
+					jsonParse = JSON.parse(jsonResponse);
+					jsonResult = jsonParse.result;
+					
+					if (jsonResult.exeption) {
+						//console.log("exeption=" + jsonResult.exeption);
+						//setHtmlToInfoElement("Communication with server failed");
+						setHtmlToInfoElement("Communication with server failed");
+					}
+					else {
+						tableModel = jsonResult.model;
+						
+						//console.log("stringify ModelOrderStatus= " + JSON.stringify(ModelOrderStatus));
+
+						var header = tableModel.model.header;
+						var body = tableModel.model.body;
+
+						newModel.model.header = header;
+						newModel.model.body = body;
+						
+						console.log("stringify newModel="+JSON.stringify(newModel));
+						
+						
+						if (orderStatusTableComponent) {
+							orderStatusTableComponent.destroy();
+						}
+						orderStatusTableComponent = uxNg2.createComponent("#DivOrdersStatusGraph", "UxGraphComponent", newModel);
+						//orderStatusTableComponent.update();
+					}
+				}
+				else {
+					//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
+					setHtmlToInfoElement("Communication with server failed");
+				}
+				console.log("callback drawGraph end");
+				buttonRedraw();
+			}
+	});
+	
+	*/
 }
 
 function clickButton (){
-	/*clearInterval(attachIntervalId);*/
+	console.log("clickButton start");
+	setHtmlToInfoElement("");
+	clearInterval(attachIntervalId);
+	
 	setHtmlToAttribute(getLoadingButtonHtml());
-	console.log("11111");
-	var id = "9148769416513465926"; /*document.getElementById('paramform').getElementsBySelector('input[name=object]')[0].value;*/
-    /*new Ajax.RemoteCallJSON('/solutions/titalia/sparkle/kpi/getparams.jsp', { method: 'getAttachments',parameters: {currentObject: id}, onResult: callbackReload} );*/
-		//new Ajax.RemoteCallJSON('/solutions/titalia/sparkle/kpi/getparams.jsp', { method: 'getUpdatedValue',parameters: {currentObject: id}, onResult: callbackReload
-		new Ajax.RemoteCallJSON('/solutions/titalia/sparkle/kpi/getparams.jsp', { method: 'getAttachments',parameters: {currentObject: id}, onResult : function (json) {console.log("ololo!");}
-		}
-		);
-		console.log("22222");
-}
-
-function getUpdatedValue (){
-	/*clearInterval(attachIntervalId);*/
-	setHtmlToAttribute(getLoadingButtonHtml());
-	var id = "testID"; /*document.getElementById('paramform').getElementsBySelector('input[name=object]')[0].value;*/
-    new Ajax.RemoteCallJSON('/solutions/titalia/sparkle/kpi/getparams.jsp', { method: 'getUpdatedValue',parameters: {currentObject: id}, onResult: callback} );
+	drawTable();
+	
+	console.log("clickButton end");
 }
 
 function callbackReload(json) {
-console.log("callbackReload!");
+	console.log("callbackReload!");
 	KPIScriptId = guid();
 	document.cookie = "KPIScriptId="+KPIScriptId+"; path=/";
 	callback(json);
 }
 
 function callback(json) {
-	console.log("Callback!");
-	/*
-    var result = json.result;
-    console.log(result);
-    if (result) {
-    	attachValues = JSON.parse(json.linksJson);
-    	console.log(attachValues);
-    	attachCheckExpired();
-    	console.log("attachCheckExpired");
-    	attachRedraw();
-    	attachIntervalId = setInterval(function() {
-    		checkScriptId();
-    		attachCheckExpired();
-    		attachRedraw();		
-    	}, 5000);
-    } else {
-        setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
-    }
-		*/
+	console.log("Callback start!");
+
+	var jsonResponse = json.response;
+	var jsonParse;
+	var jsonResult;
+	var tableModel;
+	
+	var newModel = {
+		model: {
+			header:{},
+			body:{}
+		}
+	};
+	
+	if (jsonResponse) {
+		console.log("jsonResponse=" + jsonResponse);
+		jsonParse = JSON.parse(jsonResponse);
+		jsonResult = jsonParse.result;
+		
+		if (jsonResult.exeption) {
+			//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
+			setHtmlToInfoElement("Communication with server failed");
+		}
+		else {
+			tableModel = jsonResult.model;
+			
+			//console.log("stringify ModelOrderStatus= " + JSON.stringify(ModelOrderStatus));
+
+			var header = tableModel.model.header;
+			var body = tableModel.model.body;
+
+			newModel.model.header = header;
+			newModel.model.body = body;
+			
+			//console.log("stringify newModel="+JSON.stringify(newModel));
+			
+			component.destroy();
+			component = uxNg2.createComponent("#OrderStatus", "UxTableComponent", newModel);
+			
+			buttonRedraw();
+			/*
+			attachIntervalId = setInterval(function() {
+				checkScriptId();
+				buttonRedraw();		
+			}, 5000);
+			*/
+		}
+		
+	}
+	else {
+		//setHtmlToAttribute(getButtonHtml()+" Communication with server failed");
+		setHtmlToInfoElement("Communication with server failed");
+	}
+	console.log("callback end");
 }
 
 function getButtonHtml(){
-    var html = "<a href=\"#\" onclick=\"checkRefreshObjects()\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC" +
+    var html = "<a href=\"#\" onclick=\"clickButton()\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQC" +
     		"AYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2" +
     		"tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8" +
     		"iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpS" +
@@ -441,7 +637,10 @@ function getLoadingButtonHtml(){
 }
 
 function setHtmlToAttribute (html){
-	document.getElementById('attachTest').innerHTML=html;
+	document.getElementById('UpdateButton').innerHTML=html;
+}
+function setHtmlToInfoElement (html){
+	document.getElementById('KPIInfoContent').innerHTML=html;
 }
 
 function getCookie(cname) {

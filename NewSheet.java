@@ -81,7 +81,7 @@ public class NewSheet extends UniSheet {
         String edObj;
 
         printPrototypeFix();
-        printUXHeader();
+        //printUXHeader();
 
         //"Orders by statuses"
         /*
@@ -96,11 +96,11 @@ public class NewSheet extends UniSheet {
         );
         */
 
-        sdObj = printUXDateField("Start date","StartDate", "UxDateFieldComponent", KPISheetHelper.SQLFILE_GET_START_DATE_DATA);
-        edObj = printUXDateField("End date","EndDate", "UxDateFieldComponent", KPISheetHelper.SQLFILE_GET_END_DATE_DATA);
+        //sdObj = printUXDateField("Start date","StartDate", "UxDateFieldComponent", KPISheetHelper.SQLFILE_GET_START_DATE_DATA);
+        //edObj = printUXDateField("End date","EndDate", "UxDateFieldComponent", KPISheetHelper.SQLFILE_GET_END_DATE_DATA);
 
         //"Error Orders"
-
+/*
         Object[] filterOrderStatus = new Object[]{"30.01.2018", "02.02.2018"};
 
         printUXTable(
@@ -113,12 +113,32 @@ public class NewSheet extends UniSheet {
                         filterOrderStatus
                 )
         );
+*/
 
+        //out.print("<link rel=\"import\" href=\"/solutions/titalia/sparkle/kpi/OrdersPage.html\">");
 
+        //out.print("<script type='text/javascript' src='https://code.jquery.com/jquery-1.10.2.js'></script>\n");
+
+        out.print("<html> \n" +
+                "  <head> \n" +
+                "    <script src=\"/scripts/jquery.js\"></script> \n" +
+                "    <script> \n" +
+                "    $(function(){\n" +
+                "      $(\"#includedContent\").load(\"/solutions/titalia/sparkle/kpi/OrdersPage.html\"); \n" +
+                "    });\n" +
+                "    </script> \n" +
+                "  </head> \n" +
+                "\n" +
+                "  <body> \n" +
+                "     <div id=\"includedContent\"></div>\n" +
+                "  </body> \n" +
+                "</html>");
+
+/*
         out.print("<script>jQuery.getScript(\"/solutions/"
                 + "titalia/sparkle/kpi/getparams.js\", function(){"
-                + "attachInit();});</script>");
-
+                + "pageInit();});</script>");
+*/
 
         /**
          *
@@ -345,10 +365,9 @@ public class NewSheet extends UniSheet {
                         "</script>\n"
         );
 
-        //out.print("<script src=\"/scripts/prototype.js\"></script>");
-
-        out.print("<script src=\"/scripts/rjRPC.js\"></script>");
         out.print(outputString.toString());
+        //out.print("<script src=\"/scripts/prototype.js\"></script>");
+        //out.print("<script src=\"/scripts/rjRPC.js\"></script>");
     }
 
 
