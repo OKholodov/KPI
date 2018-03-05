@@ -7,6 +7,7 @@ import com.netcracker.ejb.attribute.Attribute;
 import com.netcracker.ejb.attribute.AttributeConst;
 import com.netcracker.ejb.core.eventnotifications.listeners.ModificationListenerConst;
 import com.netcracker.jsp.UniSheet;
+
 import com.netcracker.platform.core.ncdo.model.dataobject.MutableNCDataObject;
 import com.netcracker.platform.core.ncdo.model.dataobject.NCMetaDataTools;
 import com.netcracker.solutions.titalia.sparkle.ff.pmdesktop.DateFilter;
@@ -30,6 +31,7 @@ import org.springframework.jdbc.core.RowMapper;
 import com.netcracker.mediation.common.spring.CommonContextProvider;
 
 import javax.script.*;
+//import javax.servlet.jsp.PageContext;
 
 import com.netcracker.solutions.titalia.sparkle.kpi.KPISheetHelper;
 import com.netcracker.solutions.titalia.sparkle.kpi.KPISQLData;
@@ -63,6 +65,14 @@ public class NewSheet extends UniSheet {
 
     KPISheetHelper kpiHelper = new KPISheetHelper();
 
+    /*
+    public NewSheet(PageContext pageContext)
+    {
+        super();
+        setPageContext(pageContext);
+    }
+    */
+    
     @Override
     public void printWindowContent() throws Exception {
         new PersistenceUtils().doInPersistenceContext(
