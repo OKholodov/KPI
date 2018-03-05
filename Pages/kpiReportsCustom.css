@@ -1,0 +1,38 @@
+.ux-table__virtual-scroll {
+  display: block;
+  max-height: 500px;
+  overflow: visible!important;
+  overflow-y: visible !important;
+}
+
+.ux-table__column {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  min-height: 36px;
+  flex: 1 1 0;
+}
+
+.ux-graph{
+	-webkit-box-flex:1;
+	-ms-flex:1 1 100%;
+	flex:1 1 100%;
+	display: block;
+}
+
+/*
+.ux-graph._list{height:80px;margin-bottom:-30px;margin-top:-10px}
+.ux-graph._list-alternate{position:relative;top:5px}
+.ux-graph._list .highcharts-xaxis-labels{-webkit-transform:translateY(-5px);transform:translateY(-5px)}
+.ux-graph._small{width:180px}
+.ux-graph._large{width:250px}
+.ux-graph.highcharts-credits{display:none!important}
+.ux-graph.highcharts-background{fill:transparent!important}
+*/

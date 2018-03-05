@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Webpack Bundle Analyzer</title>
+    <link rel="stylesheet" id="themeStyleSheet" href="/ux-ng2-embedded-components/0.0.2/assets/base.css">
+		<link rel="stylesheet" id="themeStyleSheet" href="/solutions/titalia/sparkle/kpiReports/kpiReportsCustom.css">
+		
+		<script type='text/javascript' src='/ux-ng2-embedded-components/0.0.2/ng-app.js'></script>
+		<script type='text/javascript' src='/solutions/titalia/sparkle/kpiReports/getparams.js'></script>
+		<script src="/scripts/rjRPC.js"></script>
+		
+		<!--	
+		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts.js"></script>
+		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts-more.js"></script>
+		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/exporting.js"></script>
+		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/no-data-to-display.js"></script>
+		<script type="text/javascript" src="/dashboard/scripts/highchartslang_rev5895.js"></script>
+		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/drilldown.js"></script>
+		<script type="text/javascript" src="/dashboard/scripts/drilldown_rev5895.js"></script>
+		 <script type="text/javascript" src="/dashboard/scripts/highcharts-autoparams.js"></script> 
+		 -->
+  </head>
+	<body>
+		
+		<table style="width: 99%; clear: both; border-top: 2px solid #69c; box-sizing: border-box;" border="0" cellspacing="0" cellpadding="0">
+			<tbody>
+				<tr>
+					<td>
+						<!--<input type="hidden" name="flagUp" value="">-->
+
+							<!-- toolbar -->
+							<table class="ControlPanel" cellpadding="0" cellspacing="0" border="0">
+								<tbody>
+									<tr>
+										<td class="withoutBorder">
+											<a href="#" onclick="clickButton()" id="ProceedButton" aria-label="" style="background-image:url(&quot;/skins/cambridge/img/ico/ico_approve.gif&quot;);" class="IconButton">Proceed</a>
+										</td>
+										<td class="withoutBorder">
+											<div id="UpdateButton"></div>
+										</td>
+										<td class="withoutBorder">
+											<div id="KPIInfoContent"></div>
+										</td>
+										<td style="width:100%">&nbsp;</td>
+									</tr>
+								</tbody>
+							</table>
+							<!-- /toolbar -->
+
+							<table class="InfoTable" style="width: 100%; border-top:0px;" cellpadding="0" cellspacing="0" border="0">
+								<tbody>
+									<tr class="InfolineHead InfolineFirstHead">
+										<td colspan="6">
+											<div>Parameters</div>
+										</td>
+									</tr>
+								</tbody>
+								<tbody >
+									<tr>
+										<td style="vertical-align: middle; width: 5%;">
+											<div style="font-size: 14px; width: 130px;">Start date</div>
+										</td>
+										<td style="vertical-align: middle;">
+											<span class="nc-param-value" style="margin-left:0px;">
+												<table class="VisualValueTable">
+													<tbody>
+														<tr class="line">
+															<td class="text">
+																<div id="DivStartDate" style="width: 130px;" ></div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</span>
+										</td>
+										<!--td style="width: 5%;">&nbsp;</td>
+										<td style="width: 5%;">&nbsp;</td> -->
+									</tr>
+									<tr>
+										<td style="vertical-align: middle; width: 5%;">
+											<div style="font-size: 14px; width: 130px;">End date</div>
+										</td>
+										<td style="vertical-align: middle;">
+											<span class="nc-param-value" style="margin-left:0px;">
+												<table class="VisualValueTable">
+													<tbody>
+														<tr class="line">
+															<td class="text">
+																<div id="DivEndDate" style="width: 130px;"></div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<div class="TitleTabLeft">
+			<div class="TitleTabRight">
+				<table cellpadding="0" cellspacing="0" border="0" class="TitleTab">
+					<tbody>
+						<tr>
+							<td></td>
+							<td class="nowrap"></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="titleCorner"></div>
+			</div>
+		</div>
+    <div id="DivOrdersStatusGraph" style="width: 80%;" class="ux-graph"></div>
+
+		<div class="TitleTabLeft">
+			<div class="TitleTabRight">
+				<table cellpadding="0" cellspacing="0" border="0" class="TitleTab">
+					<tbody>
+						<tr>
+							<td></td>
+							<td class="nowrap">Orders by Status</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="titleCorner"></div>
+			</div>
+		</div>
+		<div style="width: 80%;">
+			<div id="DivOrdersStatusTable" class="ux-table" style="margin-bottom: 30px"></div>
+		</div>
+		
+		<script type='text/javascript'>
+			/* 	Fix the problem in prototype.js
+					Line: var query = document.evaluate(expression, $(parentElement) || document,
+			*/
+			document._getElementsByXPath = function(expression, parentElement) {
+				var results = [];
+				var query = document.evaluate(expression, document,
+					null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+				for (var i = 0, length = query.snapshotLength; i < length; i++)
+					results.push(query.snapshotItem(i));
+				return results;
+			};
+		</script>
+		
+		<script type='text/javascript'>
+			pageInit();
+		</script>
+		
+	</body>
+</html>

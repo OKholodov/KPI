@@ -1,4 +1,4 @@
-package com.netcracker.solutions.titalia.sparkle.kpi;
+package com.netcracker.solutions.titalia.sparkle.kpiReports;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,6 @@ import com.netcracker.mediation.common.spring.CommonContextProvider;
 import com.netcracker.framework.query.*;
 
 public class KPISQLData {
-
     private final Logger LOG = LoggerFactory.getLogger(KPISQLData.class);
 
     public final String data;
