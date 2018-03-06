@@ -30,6 +30,7 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
     public static final String SQLFILE_GET_ORDER_BY_STATUS_T_DATA  = "GET_ORDER_BY_STATUS_T_DATA";
 
     public static final String SQLFILE_GET_ORDER_BY_STATUS_G_DATA  = "GET_ORDER_BY_STATUS_G_DATA";
+    public static final String SQLFILE_GET_ERR_G_DATA  = "GET_ERR_G_DATA";
 
     public static final String SQLFILE_GET_ERR_T_HEAD  = "GET_ERR_ORDER_T_HEAD";
     public static final String SQLFILE_GET_ERR_T_DATA  = "GET_ERR_ORDER_T_DATA";
@@ -121,8 +122,20 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
         //Map<String, Object> result = new HashMap<String, Object>();
 
         Map<String, Object> result = new LinkedHashMap<String, Object>();
+
+        /*
+            Code to define what table data return. Can be:
+            ORDERS_BY_STATUS
+            ERROR_ORDERS
+            ORDERS_DURATION
+            ...tbd
+         */
+        String code;
         String SD;
         String ED;
+
+        String headerSql = "";
+        String bodySql = "";
 
         //LinkedHashMap<String, LinkedHashMap<String, Object>> res = new LinkedHashMap<String, LinkedHashMap<String, Object>>();
 
@@ -134,10 +147,25 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 
         try
         {
+            code = ((String) params.get("CODE")).replace("\"","");
             SD = ((String) params.get("SD")).replace("\"","");
             ED = ((String) params.get("ED")).replace("\"","");
+
+            LOG.debug("code = " + code);
             LOG.debug("SD = " + SD);
             LOG.debug("ED = " + ED);
+
+            switch (code) {
+                case "ORDERS_BY_STATUS":
+                    headerSql = SQLFILE_GET_ORDER_BY_STATUS_T_HEAD;
+                    bodySql = SQLFILE_GET_ORDER_BY_STATUS_T_DATA;
+                    break;
+                case "ERROR_ORDERS":
+                    headerSql = SQLFILE_GET_ERR_T_HEAD;
+                    bodySql = SQLFILE_GET_ERR_T_DATA;
+                    break;
+            }
+
 
             Object[] tableFilter = new Object[]{SD, ED};
             StringBuilder outputString = new StringBuilder();
@@ -154,7 +182,7 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
                     "      \"rows\": ["
             );
 
-            List<KPISQLData> getTableHeader = KPISQLData.getData(findSQL(SQLFILE_GET_ORDER_BY_STATUS_T_HEAD));
+            List<KPISQLData> getTableHeader = KPISQLData.getData(findSQL(headerSql));
             if (getTableHeader.size() == 1) {
                 outputString.append(getTableHeader.get(0).data + "\n");
             }
@@ -171,7 +199,7 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 
             // Model body
             List<KPISQLData> rows;
-            rows = KPISQLData.getData(findSQL(SQLFILE_GET_ORDER_BY_STATUS_T_DATA),tableFilter);
+            rows = KPISQLData.getData(findSQL(bodySql),tableFilter);
 
             if (rows.size() < 1) {existRows = false;}
 
@@ -228,15 +256,36 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
         //Map<String, Object> result = new HashMap<String, Object>();
 
         Map<String, Object> result = new LinkedHashMap<String, Object>();
+
+        /*
+            Code to define what table data return. Can be:
+            ORDERS_BY_STATUS
+            ERROR_ORDERS
+            ORDERS_DURATION
+            ...tbd
+         */
+        String code;
         String SD;
         String ED;
 
+        String bodySql = "";
+
         try
         {
+            code = ((String) params.get("CODE")).replace("\"","");
             SD = ((String) params.get("SD")).replace("\"","");
             ED = ((String) params.get("ED")).replace("\"","");
             LOG.debug("SD = " + SD);
             LOG.debug("ED = " + ED);
+
+            switch (code) {
+                case "ORDERS_BY_STATUS":
+                    bodySql = SQLFILE_GET_ORDER_BY_STATUS_G_DATA;
+                    break;
+                case "ERROR_ORDERS":
+                    bodySql = SQLFILE_GET_ERR_G_DATA;
+                    break;
+            }
 
             Object[] graphFilter = new Object[]{SD, ED};
             StringBuilder outputString = new StringBuilder();
@@ -245,7 +294,7 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 
             /* ************************************ Start Constructing model ************************************ */
             outputString.append("{\"series\": [");
-            List<KPISQLData> getData = KPISQLData.getData(findSQL(SQLFILE_GET_ORDER_BY_STATUS_G_DATA),graphFilter);
+            List<KPISQLData> getData = KPISQLData.getData(findSQL(bodySql),graphFilter);
             if (getData.size() == 1) {
                 outputString.append(getData.get(0).data + "\n");
             }

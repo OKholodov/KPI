@@ -1,13 +1,6 @@
-select q'<{ 
-"id": >' || rownum || q'<,
-"columns": [
-{"value": ">' || ed || q'<" },
-{"value": ">' || error_sum || q'<" },
-{"value": ">' || error_percent || q'<" },
-{"value": ">' || Total || q'<" }
-],
-"initIndex": >' || (rownum-1) || q'<
-}>' as data
+select  
+'{"name": "Total number with error", "data": [' || listagg(error_sum, ', ') WITHIN GROUP (order by ed) || ']},
+{"name": "Total Number", "data": [' || listagg(Total, ', ') WITHIN GROUP (order by ed) || ']}' as data
 from (
   select  ed,
           error_sum,
@@ -21,6 +14,5 @@ from (
     from kpi_orders
     where execution_date between to_date(?, 'DD.MM.YYYY') and to_date(?, 'DD.MM.YYYY')
     group by  execution_date
-    order by execution_date
   )
 )

@@ -16,7 +16,7 @@ select q'<{
 }>' as data
 from (
   select 
-      to_date(execution_date) ed,
+      execution_date ed,
       sum(decode(status, 'Suspended',   order_sum, 0)) Suspended,
       sum(decode(status, 'Cancelled',   order_sum, 0)) Cancelled,
       sum(decode(status, 'Completed',   order_sum, 0)) Completed,
@@ -28,7 +28,7 @@ from (
       sum(order_sum) Total
   from kpi_orders
 	where execution_date between to_date(?, 'DD.MM.YYYY') and to_date(?, 'DD.MM.YYYY')
-  group by  to_date(execution_date)
-  order by to_date(execution_date)
+  group by  execution_date
+  order by execution_date
 )
-order by ed
+--order by ed

@@ -11,57 +11,21 @@ select q'<
 								 },
 								 {
 										 "styleClass": "_header",
-										 "value": "Suspended",
+										 "value": "Total Number with error",
                      "filter": false,
-                     "sort": "asc"
+                     "sort": true
 								 },
 								 {
 										 "styleClass": "_header",
-										 "value": "Cancelled",
+										 "value": "Number Of Errors %",
 										 "filter": false,
-                     "sort": "asc"
+                     "sort": true
 								 },
 								 {
 										 "styleClass": "_header",
-										 "value": "Completed",
+										 "value": "Total Number  ",
 										 "filter": false,
-                     "sort": "asc"
-								 },
-								 {
-										 "styleClass": "_header",
-										 "value": "Superseded",
-										 "filter": false,
-                     "sort": "asc"
-								 },
-								 {
-										 "styleClass": "_header",
-										 "value": "Processing",
-										 "filter": false,
-                     "sort": "asc"
-								 },
-								 {
-										 "styleClass": "_header",
-										 "value": "Archived",
-										 "filter": false,
-                     "sort": "asc"
-								 },
-								 {
-										 "styleClass": "_header",
-										 "value": "Entering",
-										 "filter": false,
-                     "sort": "asc"
-								 },
-								 {
-										 "styleClass": "_header",
-										 "value": "Suspending",
-										 "filter": false,
-                     "sort": "asc"
-								 },
-								 {
-										 "styleClass": "_header",
-										 "value": "Total",
-										 "filter": false,
-                     "sort": "asc"
+                     "sort": true
 								 }
 							]
 				 }>' as data

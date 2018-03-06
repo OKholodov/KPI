@@ -11,8 +11,9 @@ var divEndDate = "#DivEndDate";
 var divTable = "#DivOrdersStatusTable";
 var divGraph = "#DivOrdersStatusGraph";
 
-
-
+var vTableCode; // = "ORDERS_BY_STATUS";
+var vGraphCode; // = "ORDERS_BY_STATUS";
+var vGraphName; //"Orders by statuses"
 
 var tableLoaded;
 var graphLoaded;
@@ -108,6 +109,71 @@ function drawElements() {
 			}
 		}
 	);
+	/*
+console.log("try load checkbox");
+			var chkboxModel = {
+					"items": [
+						{
+							"label": "New York",
+							"value": {
+								"id": 1,
+								"code": "NY"
+							}
+						},
+						{
+							"label": "Rome",
+							"value": {
+								"id": 2,
+								"code": "RM"
+							}
+						},
+						{
+							"label": "London",
+							"value": {
+								"id": 3,
+								"code": "LDN"
+							}
+						},
+						{
+							"label": "Istanbul",
+							"value": {
+								"id": 4,
+								"code": "IST"
+							}
+						},
+						{
+							"label": "Paris",
+							"value": {
+								"id": 5,
+								"code": "PRS"
+							}
+						}
+					],
+					"value": [
+						{
+							"label": "Rome",
+							"value": {
+								"id": 2,
+								"code": "RM"
+							}
+						},
+						{
+							"label": "Istanbul",
+							"value": {
+								"id": 4,
+								"code": "IST"
+							}
+						}
+					]
+				};
+				
+				console.log("chkboxModel="+chkboxModel);
+				console.log("stringify chkboxModel= " + JSON.stringify(chkboxModel));
+	*/
+	//Draw checkboxes
+	//var chkboxComponent = uxNg2.createComponent("#DivChkBox", "UxCheckboxGroupComponent", chkboxModel);
+	
+	//console.log("chkboxComponent="+chkboxComponent);
 	
 	paramsIntervalId = setInterval(function() {
 		drawDependentElements();
@@ -145,6 +211,7 @@ function drawTable() {
 	{
 			method:'getTableModel',
 			parameters: {
+					CODE: vTableCode,
 					SD: startDate.toJSON(),
 					ED: endDate.toJSON()
 			},
@@ -266,7 +333,7 @@ function drawGraph() {
 						//"zoomType": "XY"
 				},
 			 "title": {
-					 "text": "Orders by statuses"
+					 "text": vGraphName
 			 },
 			 "credits": {
 					 "enabled": false
@@ -314,6 +381,7 @@ function drawGraph() {
 	{
 			method:'getGraphModel',
 			parameters: {
+					CODE: vGraphCode,
 					SD: startDate.toJSON(),
 					ED: endDate.toJSON()
 			},
