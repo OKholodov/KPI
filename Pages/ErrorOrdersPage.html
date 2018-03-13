@@ -116,7 +116,7 @@
 				<div class="titleCorner"></div>
 			</div>
 		</div>
-    <div id="DivOrdersStatusGraph" style="width: 80%;" class="ux-graph"></div>
+    <div id="DivErrorOrdersGraph" style="width: 80%;" class="ux-graph"></div>
 
 		<div class="TitleTabLeft">
 			<div class="TitleTabRight">
@@ -124,7 +124,7 @@
 					<tbody>
 						<tr>
 							<td></td>
-							<td class="nowrap">Orders by Status</td>
+							<!--<td class="nowrap">Orders by Status</td>-->
 						</tr>
 					</tbody>
 				</table>
@@ -132,7 +132,7 @@
 			</div>
 		</div>
 		<div style="width: 80%;">
-			<div id="DivOrdersStatusTable" class="ux-table" style="margin-bottom: 30px"></div>
+			<div id="DivErrorOrdersTable" class="ux-table" style="margin-bottom: 30px"></div>
 		</div>
 		
 		<script type='text/javascript'>
@@ -150,10 +150,7 @@
 		</script>
 		
 		<script type='text/javascript'>
-			vTableCode = "ERROR_ORDERS";
-			vGraphCode = "ERROR_ORDERS";
-			vGraphName = "Error Orders";
-			pageInit();
+			pageInit("ERROR_ORDERS");
 		</script>
 		
 	</body>

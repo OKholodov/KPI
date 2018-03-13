@@ -3,38 +3,48 @@ var drawDependentsIntervalId;
 
 var startDateComponent;
 var endDateComponent;
-var orderStatusTableComponent;
-var orderStatusGraphComponent;
-
 var divStartDate = "#DivStartDate";
 var divEndDate = "#DivEndDate";
-var divTable = "#DivOrdersStatusTable";
-var divGraph = "#DivOrdersStatusGraph";
 
-var vTableCode; // = "ORDERS_BY_STATUS";
-var vGraphCode; // = "ORDERS_BY_STATUS";
-var vGraphName; //"Orders by statuses"
+var pageCode;		 //Tab code
+var tableParams; //Array of UxTablesObjects and their parameters
+var graphParams; //Array of UxGraphsObjects and their parameters
 
-var tableLoaded;
-var graphLoaded;
-
-function pageInit() {
-	console.log("pageInit start");
+function pageInit(pc) {
 	var visual = "";
+	pageCode = pc;
 
 	setHtmlToInfoElement("");
 	buttonRedraw();
 	drawElements();
-	
-	console.log("pageInit end");
 }
 
-function clickButton () {
-	setHtmlToInfoElement("");
-	clearInterval(paramsIntervalId);
-	setHtmlToAttribute(getLoadingButtonHtml());
-
-	drawDependentElements();
+/*
+	pageCode:
+	ORDERS_BY_STATUS
+	ERROR_ORDERS
+	ORDER_DURATION
+	TASK_BY_NAME
+	TASK_DURATION
+	TASK_BY_DATE
+	TASK_ASSIGNMENT
+*/
+function checkHeadElements() {
+	var ret = 0;
+	
+	if (pageCode == "ORDERS_BY_STATUS") {
+		if(startDateComponent && endDateComponent) {
+			ret = 1;
+		}
+	}
+	
+	if (pageCode == "ERROR_ORDERS") {
+		if(startDateComponent && endDateComponent) {
+			ret = 1;
+		}
+	}
+	
+	return ret;
 }
 
 function drawElements() {
@@ -175,46 +185,192 @@ console.log("try load checkbox");
 	
 	//console.log("chkboxComponent="+chkboxComponent);
 	
-	paramsIntervalId = setInterval(function() {
-		drawDependentElements();
-	}, 500);
-
+	initAndDrawDependents();
 };
 
 
-// Dependent from fields elements
-function drawDependentElements() {
-
-	if(startDateComponent && endDateComponent) {
-		drawGraph();
-		drawTable();
-		clearInterval(paramsIntervalId);
-		
-		drawDependentsIntervalId = setInterval(function() {
-			if (tableLoaded == 1 && graphLoaded == 1) {
-				buttonRedraw();
-				clearInterval(drawDependentsIntervalId);
+/*
+	state:
+	"Uncreated"
+	"Error"
+	"InProgress"
+	"Created"
+*/
+function initAndDrawDependents() {
+	
+	paramsIntervalId = setInterval(function() {
+		if (checkHeadElements() == 1) {
+			tableParams = [];
+			graphParams = [];
+			
+			/* Start defining components depending on the pageCode */
+			
+			/* ORDERS_BY_STATUS */
+			if (pageCode == "ORDERS_BY_STATUS") {
+			
+				tableParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivOrdersStatusTable",
+						JSONParams: 
+							{
+								CODE: "ORDERS_BY_STATUS",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+							},
+						obj: {}
+					}
+				);
+				
+				graphParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivOrdersStatusGraph",
+						tittle: "Orders By Statuses",
+						year: startDateComponent.component.value.getFullYear(),
+						month: startDateComponent.component.value.getMonth(),
+						day: startDateComponent.component.value.getDate(),
+						JSONParams: 
+							{
+								CODE: "ORDERS_BY_STATUS",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+							},
+						obj: {}
+					}
+				);
+				
 			}
-		}, 500);
-		
+			
+			/* ERROR_ORDERS */
+			if (pageCode == "ERROR_ORDERS") {
+			
+				tableParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivErrorOrdersTable",
+						JSONParams: 
+							{
+								CODE: "ERROR_ORDERS",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+							},
+						obj: {}
+					}
+				);
+				
+				graphParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivErrorOrdersGraph",
+						tittle: "Error Orders",
+						year: startDateComponent.component.value.getFullYear(),
+						month: startDateComponent.component.value.getMonth(),
+						day: startDateComponent.component.value.getDate(),
+						JSONParams: 
+							{
+								CODE: "ERROR_ORDERS",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+							},
+						obj: {}
+					}
+				);
+				
+			}
+			/*  */
+
+			clearInterval(paramsIntervalId);
+			drawDependentElements();
+		}
+	}, 500);
+	
+}
+
+function destroyDependentElements() {
+	var tableLength = tableParams.length;
+	var graphLength = graphParams.length;
+	var cntLoadedTables = 0;
+	var cntLoadedGraphs = 0;
+	
+	for (var i = 0; i < tableLength; i++) {
+		if (tableParams[i].obj) {
+			if (tableParams[i].obj.component) {
+				tableParams[i].obj.destroy();
+			}
+		}
+	}
+	for (var i = 0; i < graphLength; i++) {
+		if (graphParams[i].obj) {
+			if (graphParams[i].obj.component) {
+				graphParams[i].obj.destroy();
+			}
+		}
 	}
 }
 
-function drawTable() {
-	tableLoaded = 0;
-	var startDate = toFormattedDate(startDateComponent.component.value);
-	var endDate = toFormattedDate(endDateComponent.component.value);
-	//console.log("Start date = " + startDate);
-	//console.log("End date = " + endDate);
+function clickButton () {
+	setHtmlToInfoElement("");
+	clearInterval(paramsIntervalId);
+	setHtmlToAttribute(getLoadingButtonHtml());
+	
+	destroyDependentElements();
+	initAndDrawDependents();
+}
+
+// Draw dependent from parameter fields elements
+function drawDependentElements() {
+	var tableLength = tableParams.length;
+	var graphLength = graphParams.length;
+	var cntLoadedTables = 0;
+	var cntLoadedGraphs = 0;
+
+	/* Draw table(s) */
+	for (var i = 0; i < tableLength; i++) {
+		drawTable(i);
+	}
+	
+	/* Draw graph(s) */
+	for (var i = 0; i < graphLength; i++) {
+		drawGraph(i);
+	}
+	
+	/* Waiting for update finish and redraw button */
+	drawDependentsIntervalId = setInterval(function() {
+		for (var i = 0; i < tableLength; i++) {
+			if (tableParams[i].state != "InProgress") {
+				cntLoadedTables++;
+			}
+		}
+		for (var i = 0; i < graphLength; i++) {
+			if (graphParams[i].state != "InProgress") {
+				cntLoadedGraphs++;
+			}
+		}
+		if (cntLoadedTables == tableLength && cntLoadedGraphs == graphLength) {
+			buttonRedraw();
+			clearInterval(drawDependentsIntervalId);
+		}
+	}, 500);
+	
+}
+
+function drawTable(index) {
+	if (!tableParams[index]) {
+		setHtmlToInfoElement("Communication with server failed");
+		return;
+	}
+	tableParams[index].state = "InProgress";
+
+	var tableComponent;
+	if (tableParams[index].obj) {
+		tableComponent = tableParams[index].obj;
+	}
 
 	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
 	{
 			method:'getTableModel',
-			parameters: {
-					CODE: vTableCode,
-					SD: startDate.toJSON(),
-					ED: endDate.toJSON()
-			},
+			parameters: tableParams[index].JSONParams,
 			onSuccess: function(json) {
 				var jsonResponse = json.response;
 				var jsonParse;
@@ -234,7 +390,7 @@ function drawTable() {
 					
 					if (jsonResult.exeption) {
 						setHtmlToInfoElement("Communication with server failed");
-						tableLoaded = 1;
+						tableParams[index].state = "Error";
 					}
 					else {
 						tableModel = jsonResult.model;
@@ -247,15 +403,15 @@ function drawTable() {
 						newModel.model.body = body;
 						//console.log("stringify newModel="+JSON.stringify(newModel));
 						
-						if (orderStatusTableComponent) {
-							orderStatusTableComponent.destroy();
+						if (tableComponent.component) {
+							tableComponent.destroy();
 						}
-						orderStatusTableComponent = uxNg2.createComponent(divTable, "UxTableComponent", newModel);
-						//orderStatusTableComponent.update();
+						tableComponent = uxNg2.createComponent(tableParams[index].div, "UxTableComponent", newModel);
+						//tableComponent.update();
 						
 						//console.log("UxSortTypes="+UxSortTypes);
 						
-						orderStatusTableComponent.component.customSortFunction = function(a,b,columnIndex,sortType)
+						tableComponent.component.customSortFunction = function(a,b,columnIndex,sortType)
 						{
 							console.log("sort111111");
 							let result;
@@ -270,7 +426,7 @@ function drawTable() {
 						}
 						
 						/*
-						this.orderStatusTableComponent.customSortFunction = (
+						this.tableComponent.customSortFunction = (
 							a: UxTableRow, //prev value in sort function
 							b: UxTableRow, //next value in sort function
 
@@ -295,23 +451,27 @@ function drawTable() {
 				}
 				else {
 					setHtmlToInfoElement("Communication with server failed");
-					tableLoaded = 1;
+					tableParams[index].state = "Error";
 				}
-				tableLoaded = 1;
+				tableParams[index].state = "Created";
+				tableParams[index].obj = tableComponent;
 			}
 	});
 }
 
-function drawGraph() {
-	graphLoaded = 0;
-	var startDate = toFormattedDate(startDateComponent.component.value);
-	var endDate = toFormattedDate(endDateComponent.component.value);
-	//console.log("Start date = " + startDate);
-	//console.log("End date = " + endDate);
+function drawGraph(index) {
+	if (!graphParams[index]) {
+		setHtmlToInfoElement("Communication with server failed");
+		return;
+	}
 	
-	var vYear = startDateComponent.component.value.getFullYear();
-	var vMonth = startDateComponent.component.value.getMonth();
-	var vDay = startDateComponent.component.value.getDate();
+	//console.log("Graph Params ="+JSON.stringify(graphParams[index]));
+	graphParams[index].state = "InProgress";
+
+	var graphComponent;
+	if (graphParams[index].obj) {
+		graphComponent = graphParams[index].obj;
+	}
 
 	var graphModel = {
 		 model: {
@@ -333,7 +493,7 @@ function drawGraph() {
 						//"zoomType": "XY"
 				},
 			 "title": {
-					 "text": vGraphName
+					 "text": graphParams[index].tittle
 			 },
 			 "credits": {
 					 "enabled": false
@@ -370,7 +530,7 @@ function drawGraph() {
 							},
 							"pointInterval": 1,
 							"pointIntervalUnit" : "day",
-							"pointStart": Date.UTC(vYear, vMonth, vDay)
+							"pointStart": Date.UTC(graphParams[index].year, graphParams[index].month, graphParams[index].day)
 					}
 			},
 			"series": {}
@@ -380,11 +540,7 @@ function drawGraph() {
 	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
 	{
 			method:'getGraphModel',
-			parameters: {
-					CODE: vGraphCode,
-					SD: startDate.toJSON(),
-					ED: endDate.toJSON()
-			},
+			parameters: graphParams[index].JSONParams,
 			onSuccess: function(json) {
 				var jsonResponse = json.response;
 				var jsonParse;
@@ -398,23 +554,24 @@ function drawGraph() {
 					
 					if (jsonResult.exeption) {
 						setHtmlToInfoElement("Communication with server failed");
-						graphLoaded = 1;
+						graphParams[index].state = "Error";
 					}
 					else {
 						graphSeries = jsonResult.data.series;
 						graphModel.model.series = graphSeries;
 
-						if (orderStatusGraphComponent) {
-							orderStatusGraphComponent.destroy();
+						if (graphComponent.component) {
+							graphComponent.destroy();
 						}
-						orderStatusGraphComponent = uxNg2.createComponent(divGraph, "UxGraphComponent", graphModel);
+						graphComponent = uxNg2.createComponent(graphParams[index].div, "UxGraphComponent", graphModel);
 					}
 				}
 				else {
 					setHtmlToInfoElement("Communication with server failed");
-					graphLoaded = 1;
+					graphParams[index].state = "Error";
 				}
-				graphLoaded = 1;
+				graphParams[index].state = "Created";
+				graphParams[index].obj = graphComponent;
 			}
 	});
 	
