@@ -1,0 +1,647 @@
+<!DOCTYPE html><html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Landing</title>
+<link rel="icon" type="image/x-icon" href="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/favicon.ico">
+<!--
+<script src="/scripts/prototype.js"></script>
+	<script>//            if (!Function.prototype.bind) {
+        Function.prototype.bind = function(oThis) {
+            if (typeof this !== 'function') {
+                // closest thing possible to the ECMAScript 5
+                // internal IsCallable function
+                throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+            }
+
+            var aArgs   = Array.prototype.slice.call(arguments, 1),
+                fToBind = this,
+                fNOP    = function() {},
+                fBound  = function() {
+                    return fToBind.apply(this instanceof fNOP
+                        ? this
+                        : oThis,
+                        aArgs.concat(Array.prototype.slice.call(arguments)));
+                };
+
+            if (this.prototype) {
+                // Function.prototype doesn't have a prototype property
+                fNOP.prototype = this.prototype;
+            }
+            fBound.prototype = new fNOP();
+
+            return fBound;
+        };
+        //            }
+	</script>
+		-->
+		<link href="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/styles.bundle.css" rel="stylesheet"/>
+		
+</head>
+<body><div style="width: 600px; margin: 30px auto;"><div id="table" style="margin-bottom: 30px"></div><div id="graph" style="margin-bottom: 30px"></div><div id="text" style="margin-bottom: 30px"></div><div id="date" style="margin-bottom: 30px"></div><div id="dropdown" style="margin-bottom: 30px"></div><div id="radioGroup" style="margin-bottom: 30px"></div><div id="checkbox" style="margin-bottom: 30px"></div><div id="uxTable" style="margin-bottom: 30px"></div><div id="formField" style="margin-bottom: 30px"></div><div id="checkboxGroup" style="margin-bottom: 30px"></div></div><div style="height: 0; width: 0; position: absolute; visibility: hidden; top: 0; left: 0;"><!-- inject:svg --><svg xmlns="http://www.w3.org/2000/svg"><symbol id="icon-cross" viewBox="0 0 26 26"><path d="M.98 3.808L3.81.979 13 10.17 22.19.98l2.83 2.829L15.83 13l9.19 9.192-2.83 2.829L13 15.83 3.81 25.02.98 22.192 10.17 13z"/></symbol></svg><!-- endinject --></div><script>setTimeout(function() {
+
+        var model = {
+            model: {rows: [
+                {
+                    cells: [
+                        {
+                            type: 'header',
+                            value: ''
+                        },
+                        {
+                            type: 'header',
+                            value: 'Composite Orders',
+                            filter: true
+                        },
+                        {
+                            type: 'header',
+                            value: 'Service Orders',
+                            filter: true
+                        },
+                        {
+                            type: 'header',
+                            value: 'Business Scenario'
+                        }
+                    ]
+                }, {
+                    cells: [
+                        {
+                            type: 'checkbox',
+                            value: true
+                        },
+                        {
+                            value: 'AIDA Composite Order #0000001339',
+                            href: '#',
+                            rowspan: 2
+                        },
+                        {
+                            value: 'Extend Expiry Date',
+                            colspan: 2
+                        }
+                    ]
+                }, {
+                    cells: [
+                        {
+                            type: 'checkbox',
+                            value: true
+                        },
+                        {
+                            value: 'In-flight New Data Service CFS Order #0000001361',
+                            href: '#'
+                        },
+                        {
+                            value: 'Extend Expiry Date'
+                        }
+                    ]
+                }
+            ]}
+        };
+
+        var component = uxNg2.createComponent("#table", "UxGridTableComponent", model);
+
+        var graphModel = {
+            model: {
+                "chart": {},
+                "title": {
+                    "text": ""
+                },
+                "credits": {
+                    "enabled": false
+                },
+                "xAxis": {
+                    "categories": [
+                        "September",
+                        "October",
+                        "November",
+                        "December",
+                        "January"
+                    ]
+                },
+                "labels": {
+                    "items": [
+                        {
+                            "html": "",
+                            "style": {
+                                "left": "50px",
+                                "top": "18px",
+                                "color": "black"
+                            }
+                        }
+                    ]
+                },
+                "series": [
+                    {
+                        "type": "column",
+                        "name": "Step",
+                        "data": [
+                            0,
+                            4,
+                            2.8,
+                            2.5,
+                            2.4
+                        ]
+                    },
+                    {
+                        "type": "column",
+                        "name": "Stage",
+                        "data": [
+                            1.4,
+                            1.7,
+                            1.6,
+                            1.5,
+                            1.4
+                        ]
+                    },
+                    {
+                        "type": "column",
+                        "name": "Case",
+                        "data": [
+                            0.9,
+                            1.1,
+                            1,
+                            0.9,
+                            1
+                        ]
+                    },
+                    {
+                        "type": "spline",
+                        "name": "Journey",
+                        "data": [
+                            3.5,
+                            5,
+                            3.8,
+                            3.5,
+                            3
+                        ],
+                        "marker": {
+                            "lineWidth": 2,
+                            "lineColor": "#EDD4BF",
+                            "fillColor": "white"
+                        }
+                    }
+                ]
+            }
+        };
+
+        var graphComponent = uxNg2.createComponent("#graph", "UxGraphComponent", graphModel);
+
+        var textModel = {
+            "value": "some value",
+            "placeholder": "placeholder"
+        };
+
+        var textComponent = uxNg2.createComponent("#text", "UxTextFieldComponent", textModel);
+/*
+        var dateModel = {
+            "attachToBody": true
+        };
+
+        var dateComponent = uxNg2.createComponent("#date", "UxDateFieldComponent", dateModel);
+*/
+        var dropdownModel = {
+            "items": [
+                {
+                    "label": "Select City",
+                    "value": null
+                },
+                {
+                    "label": "New York",
+                    "value": {
+                        "id": 1,
+                        "code": "NY"
+                    }
+                },
+                {
+                    "label": "Rome",
+                    "value": {
+                        "id": 2,
+                        "code": "RM"
+                    }
+                },
+                {
+                    "label": "London",
+                    "value": {
+                        "id": 3,
+                        "code": "LDN"
+                    }
+                },
+                {
+                    "label": "Istanbul",
+                    "value": {
+                        "id": 4,
+                        "code": "IST"
+                    }
+                },
+                {
+                    "label": "Paris",
+                    "value": {
+                        "id": 5,
+                        "code": "PRS"
+                    }
+                }
+            ]
+        };
+
+        var dropdownComponent = uxNg2.createComponent("#dropdown", "UxDropdownFieldComponent", dropdownModel);
+
+        var radioGroupModel = {
+            "items": [
+                {
+                    "label": "Select City",
+                    "value": null
+                },
+                {
+                    "label": "New York",
+                    "value": {
+                        "id": 1,
+                        "code": "NY"
+                    }
+                },
+                {
+                    "label": "Rome",
+                    "value": {
+                        "id": 2,
+                        "code": "RM"
+                    }
+                },
+                {
+                    "label": "London",
+                    "value": {
+                        "id": 3,
+                        "code": "LDN"
+                    }
+                },
+                {
+                    "label": "Istanbul",
+                    "value": {
+                        "id": 4,
+                        "code": "IST"
+                    }
+                },
+                {
+                    "label": "Paris",
+                    "value": {
+                        "id": 5,
+                        "code": "PRS"
+                    }
+                }
+            ]
+        };
+
+        var radioGroupComponent = uxNg2.createComponent("#radioGroup", "UxRadioGroupFieldComponent", radioGroupModel);
+
+        var checkboxModel = {
+            "value": true
+        };
+
+        var checkboxComponent = uxNg2.createComponent("#checkbox", "UxCheckboxFieldComponent", checkboxModel);
+
+        var tableModel = {
+            "model": {
+                "header": {
+                    "rows": [
+                        {
+                            "unclickable": true,
+                            "styleClass": "_header",
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "styleClass": "_header"
+                                },
+                                {
+                                    "value": "Name",
+                                    "styleClass": "_header",
+                                    "sort": "desc",
+                                    "filter": true
+                                },
+                                {
+                                    "value": "Statuses",
+                                    "styleClass": "_header",
+                                    "sort": true,
+                                    "filter": true
+                                },
+                                {
+                                    "value": "Authentication",
+                                    "styleClass": "_header",
+                                    "sort": true
+                                },
+                                {
+                                    "value": "Last By Login",
+                                    "styleClass": "_header",
+                                    "sort": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "body": {
+                    "rows": [
+                        {
+                            "id": 1,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": true
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Woods SamueWoods",
+                                    "pin": true
+                                },
+                                {
+                                    "value": "Disabled"
+                                },
+                                {
+                                    "value": "LDAP"
+                                },
+                                {
+                                    "value": "14:41 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 0,
+                            "selected": true
+                        },
+                        {
+                            "id": 8,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": false
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Eddy",
+                                    "pin": true
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "LDAP"
+                                },
+                                {
+                                    "value": "14:42 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 1
+                        },
+                        {
+                            "id": 9,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": false
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Eddy",
+                                    "pin": true
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "LDAP"
+                                },
+                                {
+                                    "value": "14:42 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 2
+                        },
+                        {
+                            "id": 10,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": false
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Eddy",
+                                    "pin": true
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "LDAP"
+                                },
+                                {
+                                    "value": "14:42 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 3
+                        },
+                        {
+                            "id": 3,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": false
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Black Austen",
+                                    "pin": true
+                                },
+                                {
+                                    "value": "Disabled"
+                                },
+                                {
+                                    "value": "ADLP"
+                                },
+                                {
+                                    "value": "14:43 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 4
+                        },
+                        {
+                            "id": 4,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": false
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Black Austen",
+                                    "pin": true
+                                },
+                                {
+                                    "value": "Disabled"
+                                },
+                                {
+                                    "value": "ADLP"
+                                },
+                                {
+                                    "value": "14:43 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 5
+                        },
+                        {
+                            "id": 2,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": true
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Arnold Franklin"
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "DAPL"
+                                },
+                                {
+                                    "value": "14:44 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 6,
+                            "selected": true
+                        },
+                        {
+                            "id": 5,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": true
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Arnold Franklin"
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "DAPL"
+                                },
+                                {
+                                    "value": "14:44 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 7,
+                            "selected": true
+                        },
+                        {
+                            "id": 6,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": true
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Arnold Franklin"
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "DAPL"
+                                },
+                                {
+                                    "value": "14:44 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 8,
+                            "selected": true
+                        },
+                        {
+                            "id": 7,
+                            "columns": [
+                                {
+                                    "type": "checkbox",
+                                    "value": true
+                                },
+                                {
+                                    "type": "link",
+                                    "value": "Arnold Franklin"
+                                },
+                                {
+                                    "value": "Enabled"
+                                },
+                                {
+                                    "value": "DAPL"
+                                },
+                                {
+                                    "value": "14:44 / 31 July 2017"
+                                }
+                            ],
+                            "initIndex": 9,
+                            "selected": true
+                        }
+                    ]
+                }
+            }
+        };
+
+        var uxTableComponent = uxNg2.createComponent("#uxTable", "UxTableComponent", tableModel);
+
+        var checkboxGroupFieldComponent = {items: [
+            {
+                "label": "New York",
+                "value": {
+                    "id": 1,
+                    "code": "NY"
+                }
+            },
+            {
+                "label": "Rome",
+                "value": {
+                    "id": 2,
+                    "code": "RM"
+                }
+            },
+            {
+                "label": "London",
+                "value": {
+                    "id": 3,
+                    "code": "LDN"
+                }
+            },
+            {
+                "label": "Istanbul",
+                "value": {
+                    "id": 4,
+                    "code": "IST"
+                }
+            },
+            {
+                "label": "Paris",
+                "value": {
+                    "id": 5,
+                    "code": "PRS"
+                }
+            }
+        ]};
+
+        var uxCheckboxGroupFieldComponent = uxNg2.createComponent("#checkboxGroup", "UxCheckboxGroupFieldComponent", checkboxGroupFieldComponent);
+
+
+
+
+        //set public component's propery/method
+        //uxTableComponent.component.customSortFunction = () => {console.log(123);}
+
+//        subscription example
+//        var subscription = component.component.onCellClick.subscribe((event) => {console.log(event)});
+//
+//        setTimeout(()=>{
+//            subscription.unsubscribe();
+//        }, 3000);
+
+    }, 1000);
+	
+	</script>
+	
+	<!--<script type="text/javascript" src="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/main.bundle.js"></script>-->
+	
+	</body></html>

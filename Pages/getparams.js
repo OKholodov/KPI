@@ -9,6 +9,8 @@ var divEndDate = "#DivEndDate";
 var pageCode;		 //Tab code
 var tableParams; //Array of UxTablesObjects and their parameters
 var graphParams; //Array of UxGraphsObjects and their parameters
+var chkboxParams;
+var chkboxesLoaded = 0;
 
 function pageInit(pc) {
 	var visual = "";
@@ -33,13 +35,13 @@ function checkHeadElements() {
 	var ret = 0;
 	
 	if (pageCode == "ORDERS_BY_STATUS") {
-		if(startDateComponent && endDateComponent) {
+		if(startDateComponent && endDateComponent && chkboxesLoaded == 1) {
 			ret = 1;
 		}
 	}
 	
 	if (pageCode == "ERROR_ORDERS") {
-		if(startDateComponent && endDateComponent) {
+		if(startDateComponent && endDateComponent && chkboxesLoaded == 1) {
 			ret = 1;
 		}
 	}
@@ -48,7 +50,7 @@ function checkHeadElements() {
 }
 
 function drawElements() {
-
+	
 	// Draw start date field
 	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
 		{
@@ -64,15 +66,23 @@ function drawElements() {
 					var jsonResult = jsonParse.result;
 					if (jsonResult.exeption) {
 						setHtmlToInfoElement("Communication with server failed");
+						console.log("error=" + jsonResult.exeption);
 					}
 					else {
-						var sdFieldModel = jsonResult.model;
-						//console.log("stringify sdFieldModel="+JSON.stringify(sdFieldModel));
+						//var sdFieldModel = jsonResult.model;
+						//console.log("stringify sdFieldModel="+JSON.stringify(jsonResult.model));
+						
+						var sdFieldModel = {
+							"dateFormat": jsonResult.model.dateFormat,
+							"attachToBody": jsonResult.model.attachToBody,
+							"value": jsonResult.model.value
+						};
 						
 						if (startDateComponent) {
 							startDateComponent.destroy();
 						}
 						else {
+							//sdFieldModel = {"value":"03.02.2018","attachToBody":false,"dateFormat":"DD.MM.YYYY"};
 							startDateComponent = uxNg2.createComponent(divStartDate, "UxDateFieldComponent", sdFieldModel);
 						}
 					}
@@ -84,7 +94,8 @@ function drawElements() {
 			}
 		}
 	);
-	
+
+
 	// Draw end date field
 	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
 		{
@@ -102,13 +113,21 @@ function drawElements() {
 						setHtmlToInfoElement("Communication with server failed");
 					}
 					else {
-						var edFieldModel = jsonResult.model;
+						//var edFieldModel = jsonResult.model;
+						//console.log("stringify edFieldModel="+JSON.stringify(jsonResult.model));
+						
+						var edFieldModel = {
+							"dateFormat": jsonResult.model.dateFormat,
+							"attachToBody": jsonResult.model.attachToBody,
+							"value": jsonResult.model.value
+						};
 						//console.log("stringify edFieldModel="+JSON.stringify(edFieldModel));
 						
 						if (endDateComponent) {
 							endDateComponent.destroy();
 						}
 						else {
+							//edFieldModel = {"value":"03.02.2018","attachToBody":false,"dateFormat":"DD.MM.YYYY"};
 							endDateComponent = uxNg2.createComponent(divEndDate, "UxDateFieldComponent", edFieldModel);
 						}
 					}
@@ -119,75 +138,137 @@ function drawElements() {
 			}
 		}
 	);
-	/*
-console.log("try load checkbox");
-			var chkboxModel = {
-					"items": [
-						{
-							"label": "New York",
-							"value": {
-								"id": 1,
-								"code": "NY"
-							}
-						},
-						{
-							"label": "Rome",
-							"value": {
-								"id": 2,
-								"code": "RM"
-							}
-						},
-						{
-							"label": "London",
-							"value": {
-								"id": 3,
-								"code": "LDN"
-							}
-						},
-						{
-							"label": "Istanbul",
-							"value": {
-								"id": 4,
-								"code": "IST"
-							}
-						},
-						{
-							"label": "Paris",
-							"value": {
-								"id": 5,
-								"code": "PRS"
-							}
-						}
-					],
-					"value": [
-						{
-							"label": "Rome",
-							"value": {
-								"id": 2,
-								"code": "RM"
-							}
-						},
-						{
-							"label": "Istanbul",
-							"value": {
-								"id": 4,
-								"code": "IST"
-							}
-						}
-					]
-				};
-				
-				console.log("chkboxModel="+chkboxModel);
-				console.log("stringify chkboxModel= " + JSON.stringify(chkboxModel));
-	*/
-	//Draw checkboxes
-	//var chkboxComponent = uxNg2.createComponent("#DivChkBox", "UxCheckboxGroupComponent", chkboxModel);
 	
-	//console.log("chkboxComponent="+chkboxComponent);
-	
+	initAndDrawCheckboxes();
 	initAndDrawDependents();
 };
 
+
+function initAndDrawCheckboxes() {
+	/* Start defining components depending on the pageCode */
+	chkboxParams = [];
+	chkboxesLoaded = 0;
+			
+	/* ORDERS_BY_STATUS */
+	if (pageCode == "ORDERS_BY_STATUS") {
+	
+		chkboxParams.push(
+			{	state: "Uncreated",
+				div: "#CFSTypesChkBox",
+				JSONParams: {
+					CODE: "CFS_TYPE"
+				},
+				obj: {}
+			}
+		);
+		
+		chkboxParams.push(
+			{	state: "Uncreated",
+				div: "#BSChkBox",
+				JSONParams: {
+					CODE: "BUSINESS_SCENARIO"
+				},
+				obj: {}
+			}
+		);
+		
+		chkboxParams.push(
+			{	state: "Uncreated",
+				div: "#StatusChkBox",
+				JSONParams: {
+					CODE: "STATUS"
+				},
+				obj: {}
+			}
+		);
+		
+		chkboxParams.push(
+			{	state: "Uncreated",
+				div: "#AgeChkBox",
+				JSONParams: {
+					CODE: "AGE"
+				},
+				obj: {}
+			}
+		);
+
+	}
+	
+	
+	/* Start drawing checkboxes */
+	var chkboxLength = chkboxParams.length;
+	var cntLoadedChkboxes = 0;
+	var chkboxInterval;
+
+	for (var i = 0; i < chkboxLength; i++) {
+		drawCheckbox(i);
+	}
+	
+	/* Waiting for update finish and redraw button */
+	chkboxInterval = setInterval(function() {
+		cntLoadedChkboxes = 0;
+		for (var i = 0; i < chkboxLength; i++) {
+			if (chkboxParams[i].state != "InProgress" && chkboxParams[i].state != "Uncreated") {
+				cntLoadedChkboxes++;
+			}
+		}
+		if (cntLoadedChkboxes == chkboxLength) {
+			chkboxesLoaded = 1;
+			clearInterval(chkboxInterval);
+		}
+	}, 500);
+	
+}
+
+function drawCheckbox(index) {
+	if (!chkboxParams[index]) {
+		setHtmlToInfoElement("Communication with server failed");
+		return;
+	}
+	chkboxParams[index].state = "InProgress";
+
+	var checkBoxComponent;
+	if (chkboxParams[index].obj) {
+		checkBoxComponent = chkboxParams[index].obj;
+	}
+
+	// Draw CFS Types CheckBox Group
+	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
+		{
+			method:'getCheckboxGroupFieldModel',
+			parameters: chkboxParams[index].JSONParams,
+			onSuccess: function(json) {
+				var jsonResponse = json.response;
+
+				if (jsonResponse) {
+					var jsonParse = JSON.parse(jsonResponse);
+					var jsonResult = jsonParse.result;
+					if (jsonResult.exeption) {
+						chkboxParams[index].state = "Error";
+						setHtmlToInfoElement("Communication with server failed");
+					}
+					else {
+						if (checkBoxComponent.component) {
+							checkBoxComponent.destroy();
+						}
+						else {
+							//console.log("stringify checkbox="+JSON.stringify(jsonResult.model));
+							checkBoxComponent = uxNg2.createComponent(chkboxParams[index].div, "UxCheckboxGroupFieldComponent", jsonResult.model);
+							chkboxParams[index].obj = checkBoxComponent;
+						}
+					}
+				}
+				else {
+					chkboxParams[index].state = "Error";
+					setHtmlToInfoElement("Communication with server failed");
+				}
+				chkboxParams[index].state = "Created";
+			}
+		}
+	);
+	
+	
+}
 
 /*
 	state:
@@ -203,6 +284,68 @@ function initAndDrawDependents() {
 			tableParams = [];
 			graphParams = [];
 			
+			/* Defining checkbox variables */
+			
+			var chkboxLength = chkboxParams.length;
+			var cntLoadedChkboxes = 0;
+			var currCheckboxComponent;
+			var currArray;
+			var currLength;
+			var currString;
+			var currCode;
+			
+			var cbCFS;
+			var cbBS;
+			var cbStatus;
+			var cbAge;
+			
+			console.log("111");
+
+			for (var i = 0; i < chkboxLength; i++) {
+				currString = "";
+				var j = 1;
+				if (chkboxParams[i].state == "Created") {
+					currCheckboxComponent = chkboxParams[i].obj.component;
+					currCode = chkboxParams[i].JSONParams.CODE;
+					
+					if (currCheckboxComponent.value) {
+						currArray = currCheckboxComponent.value.toArray();
+						currLength = currArray.length;
+						
+						currArray.forEach(function(element) {
+						  currString = currString + element.value.code;
+						  if (currLength > j) {
+							  currString = currString + ",";
+						  }
+						  j++;
+						});
+						
+						//console.log(currString);
+
+						switch(String(currCode)) {
+							case "CFS_TYPE":
+								cbCFS = currString;
+								break;
+							case "BUSINESS_SCENARIO":
+								cbBS = currString;
+								break;
+							case "STATUS":
+								cbStatus = currString;
+								break;
+							case "AGE":
+								cbAge = currString;
+								break;
+						}
+					}
+					
+					console.log("222");
+					
+					//console.log("stringify currCheckboxComponent="+JSON.stringify(currCheckboxComponent));
+				}
+			}
+			
+			console.log("333");
+			
 			/* Start defining components depending on the pageCode */
 			
 			/* ORDERS_BY_STATUS */
@@ -216,7 +359,11 @@ function initAndDrawDependents() {
 							{
 								CODE: "ORDERS_BY_STATUS",
 								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
-								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
 							},
 						obj: {}
 					}
@@ -234,7 +381,11 @@ function initAndDrawDependents() {
 							{
 								CODE: "ORDERS_BY_STATUS",
 								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
-								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
 							},
 						obj: {}
 					}
@@ -337,13 +488,16 @@ function drawDependentElements() {
 	
 	/* Waiting for update finish and redraw button */
 	drawDependentsIntervalId = setInterval(function() {
+		cntLoadedTables = 0;
+		cntLoadedGraphs = 0;
+		
 		for (var i = 0; i < tableLength; i++) {
-			if (tableParams[i].state != "InProgress") {
+			if (tableParams[i].state != "InProgress" && tableParams[i].state != "Uncreated") {
 				cntLoadedTables++;
 			}
 		}
 		for (var i = 0; i < graphLength; i++) {
-			if (graphParams[i].state != "InProgress") {
+			if (graphParams[i].state != "InProgress" && graphParams[i].state != "Uncreated") {
 				cntLoadedGraphs++;
 			}
 		}

@@ -4,23 +4,34 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Webpack Bundle Analyzer</title>
+	<link rel="stylesheet" id="themeStyleSheet" href="/solutions/titalia/sparkle/kpiReports/kpiReportsCustom.css">
+	<!--
     <link rel="stylesheet" id="themeStyleSheet" href="/ux-ng2-embedded-components/0.0.2/assets/base.css">
-		<link rel="stylesheet" id="themeStyleSheet" href="/solutions/titalia/sparkle/kpiReports/kpiReportsCustom.css">
-		
-		<script type='text/javascript' src='/ux-ng2-embedded-components/0.0.2/ng-app.js'></script>
-		<script type='text/javascript' src='/solutions/titalia/sparkle/kpiReports/getparams.js'></script>
-		<script src="/scripts/rjRPC.js"></script>
-		
-		<!--	
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts-more.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/exporting.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/no-data-to-display.js"></script>
-		<script type="text/javascript" src="/dashboard/scripts/highchartslang_rev5895.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/drilldown.js"></script>
-		<script type="text/javascript" src="/dashboard/scripts/drilldown_rev5895.js"></script>
-		 <script type="text/javascript" src="/dashboard/scripts/highcharts-autoparams.js"></script> 
-		 -->
+	<script type='text/javascript' src='/ux-ng2-embedded-components/0.0.2/ng-app.js'></script>
+	 
+	 
+	<link rel="stylesheet" id="themeStyleSheet" href="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/styles.bundle.css">
+	<script type='text/javascript' src='/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/main.bundle.js'></script>-->
+	
+	
+	<link href="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/styles.bundle.css" rel="stylesheet"/>
+	 
+	<script type='text/javascript' src='/solutions/titalia/sparkle/kpiReports/getparams.js'></script>
+	<script src="/scripts/rjRPC.js"></script>
+	
+
+	
+	
+	<!--	
+	<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts.js"></script>
+	<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts-more.js"></script>
+	<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/exporting.js"></script>
+	<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/no-data-to-display.js"></script>
+	<script type="text/javascript" src="/dashboard/scripts/highchartslang_rev5895.js"></script>
+	<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/drilldown.js"></script>
+	<script type="text/javascript" src="/dashboard/scripts/drilldown_rev5895.js"></script>
+	 <script type="text/javascript" src="/dashboard/scripts/highcharts-autoparams.js"></script> 
+	 -->
   </head>
 	<body>
 		
@@ -57,38 +68,108 @@
 										</td>
 									</tr>
 								</tbody>
-								<tbody >
+								<tbody>
 									<tr>
-										<td style="vertical-align: middle; width: 5%;">
-											<div style="font-size: 14px; width: 130px;">Start date</div>
+									<td style="vertical-align: top; width: 70%;">
+									<table  style="width: 100%; border-top:0px;" cellpadding="0" cellspacing="0" border="0">
+									<tr>
+									
+									
+									
+										<td style="vertical-align: top; width: 5%;">
+											<table  style="width: 100%; border-top:0px;" cellpadding="0" cellspacing="0" border="0">
+												<tbody>
+													<tr>
+														<td style="vertical-align: middle; width: 5%;">
+															<div style="font-size: 14px; width: 130px;">Start date</div>
+														</td>
+														<td style="vertical-align: middle; width: 10%;">
+															<span class="nc-param-value" style="margin-left:0px;">
+																<table class="VisualValueTable">
+																	<tbody>
+																		<tr class="line">
+																			<td class="text">
+																				<div id="DivStartDate" style="width: 130px;" ></div>
+																			</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</span>
+														</td>
+														<!--td style="width: 5%;">&nbsp;</td>
+														<td style="width: 5%;">&nbsp;</td> -->
+													</tr>
+													<tr>
+														<td style="vertical-align: middle; width: 5%;">
+															<div style="font-size: 14px; width: 130px;">End date</div>
+														</td>
+														<td style="vertical-align: middle;">
+															<span class="nc-param-value" style="margin-left:0px;">
+																<table class="VisualValueTable">
+																	<tbody>
+																		<tr class="line">
+																			<td class="text">
+																				<div id="DivEndDate" style="width: 130px;"></div>
+																			</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</span>
+														</td>
+													</tr>
+												</tbody>
+											</table>
 										</td>
-										<td style="vertical-align: middle;">
+										
+										<td style="vertical-align: top; width: 10%;">
 											<span class="nc-param-value" style="margin-left:0px;">
 												<table class="VisualValueTable">
 													<tbody>
 														<tr class="line">
 															<td class="text">
-																<div id="DivStartDate" style="width: 130px;" ></div>
+																<div id="CFSTypesChkBox" style="width: 230px;" ></div>
 															</td>
 														</tr>
 													</tbody>
 												</table>
 											</span>
 										</td>
-										<!--td style="width: 5%;">&nbsp;</td>
-										<td style="width: 5%;">&nbsp;</td> -->
-									</tr>
-									<tr>
-										<td style="vertical-align: middle; width: 5%;">
-											<div style="font-size: 14px; width: 130px;">End date</div>
-										</td>
-										<td style="vertical-align: middle;">
+										
+										<td style="vertical-align: top; width: 10%;">
 											<span class="nc-param-value" style="margin-left:0px;">
 												<table class="VisualValueTable">
 													<tbody>
 														<tr class="line">
 															<td class="text">
-																<div id="DivEndDate" style="width: 130px;"></div>
+																<div id="BSChkBox" style="width: 200px;" ></div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</span>
+										</td>
+										
+										<td style="vertical-align: top; width: 10%;">
+											<span class="nc-param-value" style="margin-left:0px;">
+												<table class="VisualValueTable">
+													<tbody>
+														<tr class="line">
+															<td class="text">
+																<div id="StatusChkBox" style="width: 120px;" ></div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</span>
+										</td>
+										
+										<td style="vertical-align: top; width: 10%;">
+											<span class="nc-param-value" style="margin-left:0px;">
+												<table class="VisualValueTable">
+													<tbody>
+														<tr class="line">
+															<td class="text">
+																<div id="AgeChkBox" style="width: 150px;" ></div>
 															</td>
 														</tr>
 													</tbody>
@@ -96,6 +177,12 @@
 											</span>
 										</td>
 									</tr>
+									
+									</table>
+										</td>
+									</tr>
+										
+									
 								</tbody>
 							</table>
 					</td>
@@ -116,7 +203,7 @@
 				<div class="titleCorner"></div>
 			</div>
 		</div>
-		<div id="DivChkBox"></div>
+		
 		
 		<div class="TitleTabLeft">
 			<div class="TitleTabRight">
@@ -164,8 +251,13 @@
 			};
 		</script>
 		
+		
 		<script type='text/javascript'>
+		
+		setTimeout(function() {
 			pageInit("ORDERS_BY_STATUS");
+			
+			}, 1000);
 		</script>
 		
 	</body>

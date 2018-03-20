@@ -37,6 +37,11 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 
     public static final String SQLFILE_GET_START_DATE_DATA  = "GET_START_DATE_DATA";
     public static final String SQLFILE_GET_END_DATE_DATA  = "GET_END_DATE_DATA";
+	
+	public static final String SQLFILE_GET_CFS_TYPES_CB_DATA  = "GET_CFS_TYPES_CB_DATA";
+	public static final String SQLFILE_GET_BUSINESS_SCENARIO_CB_DATA  = "GET_BUSINESS_SCENARIO_CB_DATA";
+	public static final String SQLFILE_GET_STATUS_CB_DATA  = "GET_STATUS_CB_DATA";
+	public static final String SQLFILE_GET_AGE_CB_DATA  = "GET_AGE_CB_DATA";
 
     private static final Logger LOG = LoggerFactory.getLogger(KPIReportsHelper.class);
 
@@ -115,6 +120,74 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
             return result;
         }
     }
+	
+	public Map getCheckboxGroupFieldModel(Map params) throws Exception
+    {
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        StringBuilder outputString = new StringBuilder();
+        String chkboxParam;
+        String sqlCode;
+
+        try
+        {
+            chkboxParam = (String) params.get("CODE");
+            LOG.debug("chkboxParam="+chkboxParam);
+			
+			switch(chkboxParam){
+				case "CFS_TYPE":
+				   sqlCode = SQLFILE_GET_CFS_TYPES_CB_DATA;
+				   break; 
+				case "BUSINESS_SCENARIO":
+				   sqlCode = SQLFILE_GET_BUSINESS_SCENARIO_CB_DATA;
+				   break; 
+				case "STATUS":
+				   sqlCode = SQLFILE_GET_STATUS_CB_DATA;
+				   break; 
+				case "AGE":
+				   sqlCode = SQLFILE_GET_AGE_CB_DATA;
+				   break; 
+				default:
+				   LOG.debug("chkboxParam wasnt recognized");
+				   result.put("exeption", "chkboxParam wasnt recognized:"+chkboxParam);
+				   return result;
+			}
+
+            /* ************************************ Start Constructing model ************************************ */
+            outputString.append("{\n");
+
+            List<KPISQLData> getDateModel = KPISQLData.getData(findSQL(sqlCode));
+            if (getDateModel.size() == 1) {
+                outputString.append(getDateModel.get(0).data + "\n");
+            }
+            else {
+                //NO DATA
+                //return new StringBuilder();
+            }
+
+            outputString.append("};");
+            /* ************************************ End Constructing model ************************************ */
+
+            LOG.debug("outputString="+outputString);
+            LOG.debug("outputString.toString()="+outputString.toString());
+
+            JSONObject jsonObj = new JSONObject(outputString.toString());
+            //JSONObject jsonObj = new JSONObject(res);
+
+            //result.put("model", outputString.toString());
+            result.put("model", jsonObj);
+
+        }
+        catch (Exception ex)
+        {
+            LOG.debug("getCheckboxGroupFieldModel Exception = " + ex.getMessage());
+            result.put("exeption", ex.getMessage());
+        }
+        finally
+        {
+            LOG.debug("resultJson from getCheckboxGroupFieldModel = " + result);
+            return result;
+        }
+    }
 
     public Map getTableModel(Map params) throws Exception
     {
@@ -133,6 +206,10 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
         String code;
         String SD;
         String ED;
+		String cbCFS;
+		String cbBS;
+		String cbStatus;
+		String cbAge;
 
         String headerSql = "";
         String bodySql = "";
@@ -150,11 +227,16 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
             code = ((String) params.get("CODE")).replace("\"","");
             SD = ((String) params.get("SD")).replace("\"","");
             ED = ((String) params.get("ED")).replace("\"","");
-
+			cbCFS = ((String) params.get("CFS_TYPE")).replace("\"","");
+			cbBS = ((String) params.get("BUSINESS_SCENARIO")).replace("\"","");
+			cbStatus = ((String) params.get("STATUS")).replace("\"","");
+			cbAge = ((String) params.get("AGE")).replace("\"","");
+/*
             LOG.debug("code = " + code);
             LOG.debug("SD = " + SD);
             LOG.debug("ED = " + ED);
-
+			LOG.debug("cbCFS = " + cbCFS);
+*/
             switch (code) {
                 case "ORDERS_BY_STATUS":
                     headerSql = SQLFILE_GET_ORDER_BY_STATUS_T_HEAD;
@@ -167,7 +249,7 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
             }
 
 
-            Object[] tableFilter = new Object[]{SD, ED};
+            Object[] tableFilter = new Object[]{SD, ED, cbCFS, cbBS, cbStatus, cbAge};
             StringBuilder outputString = new StringBuilder();
 
             //outputString = getTableModel(SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
@@ -208,23 +290,29 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
                         ", \"body\": {\n" +
                         "    \"rows\": [\n"
                 );
-            }
 
-            int i = 0;
-            for (KPISQLData sqlData : rows) {
-                outputString.append(sqlData.data + "\n");
-                if (i < (rows.size() - 1)) {
-                    outputString.append(", ");
-                }
-                i++;
-            }
+				int i = 0;
+				for (KPISQLData sqlData : rows) {
+					outputString.append(sqlData.data + "\n");
+					if (i < (rows.size() - 1)) {
+						outputString.append(", ");
+					}
+					i++;
+				}
 
-            outputString.append(
-                    "\n    ]\n" +
-                    "    }\n" +
-                    "  }\n"+
-                    "};"
-            );
+				outputString.append(
+						"\n    ]\n" +
+						"    }\n" +
+						"  }\n"+
+						"};"
+				);
+			}
+			else {
+				outputString.append(
+						"  }\n"+
+						"};"
+				);
+			}
 
             /* ************************************ End Constructing model ************************************ */
 
@@ -267,6 +355,10 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
         String code;
         String SD;
         String ED;
+		String cbCFS;
+		String cbBS;
+		String cbStatus;
+		String cbAge;
 
         String bodySql = "";
 
@@ -275,8 +367,10 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
             code = ((String) params.get("CODE")).replace("\"","");
             SD = ((String) params.get("SD")).replace("\"","");
             ED = ((String) params.get("ED")).replace("\"","");
-            LOG.debug("SD = " + SD);
-            LOG.debug("ED = " + ED);
+			cbCFS = ((String) params.get("CFS_TYPE")).replace("\"","");
+			cbBS = ((String) params.get("BUSINESS_SCENARIO")).replace("\"","");
+			cbStatus = ((String) params.get("STATUS")).replace("\"","");
+			cbAge = ((String) params.get("AGE")).replace("\"","");
 
             switch (code) {
                 case "ORDERS_BY_STATUS":
@@ -287,7 +381,7 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
                     break;
             }
 
-            Object[] graphFilter = new Object[]{SD, ED};
+            Object[] graphFilter = new Object[]{SD, ED, cbCFS, cbBS, cbStatus, cbAge};
             StringBuilder outputString = new StringBuilder();
 
             //outputString = getGraphModel(SQLFILE_GET_ORDER_BY_STATUS_G_DATA, graphFilter);

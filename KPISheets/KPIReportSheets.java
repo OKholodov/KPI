@@ -86,6 +86,9 @@ public class KPIReportSheets extends UniSheet {
     }
 
     private void printPrototypeFix() throws IOException {
+		
+		out.print("<script src=\"/scripts/prototype.js\"></script>");
+		
         StringBuilder outputString = new StringBuilder();
         outputString.append(
                 "<script>\n" +
@@ -113,6 +116,8 @@ public class KPIReportSheets extends UniSheet {
         );
 
         out.print(outputString.toString());
+		
+		out.print("<script src=\"/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/main.bundle.js\"></script>");
         //out.print("<script src=\"/scripts/prototype.js\"></script>");
         //out.print("<script src=\"/scripts/rjRPC.js\"></script>");
     }
