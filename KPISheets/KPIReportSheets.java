@@ -29,9 +29,11 @@ public class KPIReportSheets extends UniSheet {
     }
 
     private void printData() throws Exception {
-        printPrototypeFix();
+        //printPrototypeFix();
         //printUXHeader();
 
+		
+		
         out.print("<html> \n" +
                 "  <head> \n" +
                 "    <script src=\"/scripts/jquery.js\"></script> \n" +
@@ -46,6 +48,7 @@ public class KPIReportSheets extends UniSheet {
                 "     <div id=\"includedContent\"></div>\n" +
                 "  </body> \n" +
                 "</html>");
+		
 
 /*
         out.print("<script>jQuery.getScript(\"/solutions/"

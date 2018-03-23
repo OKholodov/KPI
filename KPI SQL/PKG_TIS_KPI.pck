@@ -1,18 +1,282 @@
 CREATE OR REPLACE PACKAGE PKG_TIS_KPI
 IS
+  FUNCTION SPLIT_STR_TO_ARRAYOFSTRINGS(in_str in varchar2, in_sorted in number default 0) RETURN arrayofstrings DETERMINISTIC;
   PROCEDURE CREATE_SNAPSHOT;
+  FUNCTION GET_ORDER_BY_STATUS_T_HEADER RETURN varchar2;
+  FUNCTION GET_ORDER_BY_STATUS_T_DATA RETURN varchar2;
+  
+  TYPE t_data IS TABLE OF varchar2(4000);
+  FUNCTION get_ut_by_name(in_dates VARCHAR2) RETURN t_data PIPELINED;
 
 END PKG_TIS_KPI;
 /
 CREATE OR REPLACE PACKAGE BODY PKG_TIS_KPI
 IS
 
+  FUNCTION GET_ORDER_BY_STATUS_T_HEADER
+    RETURN varchar2
+  IS
+    v_ret varchar2(30000);
+  BEGIN
+    v_ret := 
+            q'<
+                 {
+                     cells: [
+                         {
+                             type: 'header',
+                             value: 'Execution Date',
+                             filter: true
+                         },
+                         {
+                             type: 'header',
+                             value: 'Suspended'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Cancelled'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Completed'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Superseded'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Processing'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Archived'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Entering'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Suspending'
+                         },
+                         {
+                             type: 'header',
+                             value: 'Total'
+                         }
+                      ]
+                 }>'
+    ;
+
+    return v_ret;
+  
+  END GET_ORDER_BY_STATUS_T_HEADER;
+  
+  FUNCTION GET_ORDER_BY_STATUS_T_DATA
+    RETURN varchar2
+  IS
+    v_ret varchar2(32767);
+  BEGIN
+
+    select q'<{
+              cells: [
+                {
+                  type: 'datetime',
+                  value: '>' || ed || q'<'
+                },
+                {
+                  type: 'number',
+                  value: >' || Suspended || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Cancelled || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Completed || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Superseded || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Processing || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Archived || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Entering || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Suspending || q'<
+                },
+                {
+                  type: 'number',
+                  value: >' || Total || q'<
+                }
+              ]
+            }>' as data
+    into v_ret
+    from (
+      select 
+          to_date(execution_date) ed,
+          sum(decode(status, 'Suspended',   order_sum, 0)) Suspended,
+          sum(decode(status, 'Cancelled',   order_sum, 0)) Cancelled,
+          sum(decode(status, 'Completed',   order_sum, 0)) Completed,
+          sum(decode(status, 'Superseded',  order_sum, 0)) Superseded,
+          sum(decode(status, 'Processing',  order_sum, 0)) Processing,
+          sum(decode(status, 'Archived',    order_sum, 0)) Archived,
+          sum(decode(status, 'Entering',    order_sum, 0)) Entering,
+          sum(decode(status, 'Suspending',  order_sum, 0)) Suspending,
+          sum(order_sum) Total
+      from kpi_orders
+      group by  to_date(execution_date)
+    )
+    order by ed;
+  
+    return v_ret;
+  
+  END GET_ORDER_BY_STATUS_T_DATA;
+  
+  FUNCTION SPLIT_STR_TO_ARRAYOFSTRINGS(in_str in varchar2, in_sorted in number default 0) RETURN arrayofstrings
+    DETERMINISTIC
+  IS
+    ret arrayofstrings;
+  BEGIN
+    /*
+    SELECT trim(regexp_substr(in_str, '[^,]+', 1, LEVEL)) str
+    bulk collect into ret
+    FROM dual
+    CONNECT BY regexp_substr(in_str , '[^,]+', 1, LEVEL) IS NOT NULL;*/
+    
+    if in_sorted = 0 then
+      SELECT trim(COLUMN_VALUE) str
+      bulk collect into ret
+      FROM xmltable(('"' || REPLACE(in_str, ',', '","') || '"'));
+    else
+      SELECT trim(COLUMN_VALUE) str
+      bulk collect into ret
+      FROM xmltable(('"' || REPLACE(in_str, ',', '","') || '"'))
+      where exists (
+        select 1
+        from kpi_orders o
+        where o.execution_date = to_date(trim(COLUMN_VALUE),'DD.MM.YYYY')
+      )
+      order by to_date(trim(COLUMN_VALUE),'DD.MM.YYYY') desc;
+    end if;
+
+    return ret;
+  END SPLIT_STR_TO_ARRAYOFSTRINGS;
+  
+  FUNCTION get_ut_by_name(in_dates VARCHAR2) RETURN t_data PIPELINED
+  IS
+    cur sys_refcursor;
+    tp varchar2(4000);
+    
+    v_dates arrayofstrings;
+    v_dates_str varchar2(32000);
+    v_dates_strd varchar2(32000);
+    v_dates_cnt number;
+    
+    v_head varchar2(32000);
+    v_head2 varchar2(32000);
+    v_body varchar2(32000);
+  BEGIN
+    dbms_output.enable;
+    v_dates := PKG_TIS_KPI.SPLIT_STR_TO_ARRAYOFSTRINGS(in_dates,1);
+    v_dates_cnt := v_dates.count;
+    
+    v_dates_str := '';
+    v_dates_strd := '';
+    for x in 1..v_dates_cnt loop
+      v_dates_str := v_dates_str || '''' || v_dates(x) || '''' || 'as d' || x || ',';
+      v_dates_strd := v_dates_strd || 'to_date(' || '''' || v_dates(x) || '''' || q'[, 'DD.MM.YYYY')]' || ',';
+    end loop;
+    v_dates_str := substr (v_dates_str, 1, length(v_dates_str)-1);
+    v_dates_strd := substr (v_dates_strd, 1, length(v_dates_strd)-1);
+
+    dbms_output.put_line('v_dates_str=' || v_dates_str);
+    
+    -- Head
+    /*
+    select   q'< {"id": ' || rownum || ', "columns": [ >' ||
+                listagg(
+                q'[{"value": "']' || ' || "' || column_value || '" || ' || q'['" },]' ||
+                q'[{"value": "']' || ' || "delta' || rownum || '" || ' || q'['" }]'
+               ,',') within group (order by null) ||
+             q'< ], "initIndex": ' || (rownum-1) || '} ' >' as p1
+    into v_head
+    from table(v_dates)t; 
+    */
+    select   q'< {"id": ' || rownum || ', "columns": [ >' ||
+                listagg(
+                q'[{"value": "']' || ' || d' || level || ' || ' || q'['" }]' ||
+                case when level < v_dates_cnt then q'[,{"value": "']' || ' || delta' || level || ' || ' || q'['" }]' end
+               ,',') within group (order by null) ||
+             q'< ], "initIndex": ' || (rownum-1) || '} ' >' as p1
+    into v_head
+    from dual
+    connect by level < (v_dates_cnt+1); 
+    
+    dbms_output.put_line('Head=' || v_head);
+    
+    -- Head2
+    select listagg( ('d' || level || ',
+    d' || level || ' - d' || (level + 1) || ' as delta' || level), ',
+    ') within group (order by null) as str
+    into v_head2
+    from dual
+    connect by level < v_dates_cnt;
+    v_head2 := v_head2 || ', d' || v_dates_cnt;
+    
+    dbms_output.put_line('Head2=' || v_head2);
+    
+    --body
+    
+    v_body := 'select ' || '''' || v_head || ' from ( ' ||
+    ' select ' || v_head2 || q'[ from (
+        select *
+        from (
+          select to_char(execution_date,'DD.MM.YYYY') ed,
+                order_sum,
+                status
+          from kpi_orders
+          where execution_date in (]' || v_dates_strd || ')
+        ) pivot (
+          sum(order_sum)
+          for ed in (' || v_dates_str || ')
+        )
+      )
+    )';
+    
+    dbms_output.put_line('Body=' || v_body);
+ 
+    OPEN cur FOR v_body ;
+    
+    LOOP
+      FETCH cur INTO tp;
+      EXIT WHEN cur%NOTFOUND;
+      PIPE ROW (tp);
+    END LOOP;
+    
+    close cur;
+    
+    RETURN;
+    
+  END get_ut_by_name;
+  
+
   PROCEDURE CREATE_SNAPSHOT
   is
     l_execution_date date;
   begin
 
-    select sysdate into l_execution_date from dual;
+    select to_date(sysdate) into l_execution_date from dual;
     
     insert into kpi_orders (
     /*
@@ -43,12 +307,12 @@ IS
       AGE_CLASS,
       ORDER_SUM,
       ERROR_SUM,
-      ORD_DURATION_LESS_10MIN,
-      ORD_DURATION_LESS_1HOUR,
-      ORD_DURATION_LESS_1DAY,
-      ORD_DURATION_LESS_1WEEK,
-      ORD_DURATION_LESS_3WEEK,
-      ORD_DURATION_LATER_3WEEK
+      ORD_DURATION_LESS_5DAYS,
+      ORD_DURATION_LESS_10DAYS,
+      ORD_DURATION_LESS_20DAYS,
+      ORD_DURATION_LESS_40DAYS,
+      ORD_DURATION_LESS_60DAYS,
+      ORD_DURATION_LATER_60DAYS
     )
     select  /*
             l_execution_date as execution_date,
@@ -78,12 +342,12 @@ IS
             age_class,
             count(order_id) as order_sum,
             sum(is_error) as error_sum,
-            count(case when duration < 10 then 1 end) ord_duration_less_10min,
-            count(case when duration < 60 then 1 end) ord_duration_less_1hour,
-            count(case when duration < 60 * 24 then 1 end) ord_duration_less_1day,
-            count(case when duration < 60 * 24 * 7 then 1 end) ord_duration_less_1week,
-            count(case when duration < 60 * 24 * 7 * 3 then 1 end) ord_duration_less_3week,
-            count(case when duration >= 60 * 24 * 7 * 3 then 1 end) ord_duration_later_3week
+            count(case when duration < 5 then 1 end) ORD_DURATION_LESS_5DAYS,
+            count(case when duration < 10 then 1 end) ORD_DURATION_LESS_10DAYS,
+            count(case when duration < 20 then 1 end) ORD_DURATION_LESS_20DAYS,
+            count(case when duration < 40 then 1 end) ORD_DURATION_LESS_40DAYS,
+            count(case when duration < 60 then 1 end) ORD_DURATION_LESS_60DAYS,
+            count(case when duration >= 60 then 1 end) ORD_DURATION_LATER_60DAYS
     from (
       select  ord.object_id as order_id, 
               ord.name order_name,
@@ -93,7 +357,7 @@ IS
               (select value from nc_list_values lv where lv.list_value_id = pstat.list_value_id) status,
               psd.date_value as start_date,
               ped.date_value as end_date,
-              floor((coalesce(ped.date_value, l_execution_date)  - psd.date_value) * 24 * 60) duration,
+              floor((coalesce(ped.date_value, l_execution_date)  - psd.date_value)) duration,
         
               case 
                 when pkgUtils.id_to_date(ord.object_id) > l_execution_date - interval '28' DAY 

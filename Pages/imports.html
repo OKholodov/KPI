@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+	
+	<script src="/scripts/prototype.js"></script>
+	<script>
+		Function.prototype.bind = function(oThis) {
+			if (typeof this !== 'function') {
+				throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+			}
+			var aArgs = Array.prototype.slice.call(arguments, 1),
+				 fToBind = this,
+				 fNOP    = function() {},
+				 fBound  = function() {
+				 return fToBind.apply(this instanceof fNOP
+							   ? this
+							   : oThis,
+					   aArgs.concat(Array.prototype.slice.call(arguments)));
+				 };
+			if (this.prototype) {
+			  // Function.prototype doesn't have a prototype property
+			  fNOP.prototype = this.prototype;
+			}
+			fBound.prototype = new fNOP();
+			return fBound;
+		};
+	</script>
+	<script src="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/main.bundle.js"></script>
+	
+	<script src="/scripts/jquery.js"></script>
+	
+	<link rel="stylesheet" href="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/styles.bundle.css" />
+	<link rel="stylesheet" href="/solutions/titalia/sparkle/kpiReports/kpiReportsCustom.css">
+
+	<script type='text/javascript' src='/solutions/titalia/sparkle/kpiReports/getparams.js'></script>
+	<script src="/scripts/rjRPC.js"></script>
+
+  </head>
+</html>

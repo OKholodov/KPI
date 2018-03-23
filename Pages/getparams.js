@@ -6,21 +6,6 @@ var endDateComponent;
 var divStartDate = "#DivStartDate";
 var divEndDate = "#DivEndDate";
 
-var pageCode;		 //Tab code
-var tableParams; //Array of UxTablesObjects and their parameters
-var graphParams; //Array of UxGraphsObjects and their parameters
-var chkboxParams;
-var chkboxesLoaded = 0;
-
-function pageInit(pc) {
-	var visual = "";
-	pageCode = pc;
-
-	setHtmlToInfoElement("");
-	buttonRedraw();
-	drawElements();
-}
-
 /*
 	pageCode:
 	ORDERS_BY_STATUS
@@ -31,118 +16,186 @@ function pageInit(pc) {
 	TASK_BY_DATE
 	TASK_ASSIGNMENT
 */
+var pageCode;	 //Tab code
+var glTittle;
+
+var tableParams; //Array of UxTablesObjects and their parameters
+var graphParams; //Array of UxGraphsObjects and their parameters
+
+var chkboxParams; //Array of checkbox groups and their parameters
+var chkboxesLoaded = 0;
+
+var datesParams; //Array of date fields and their parameters
+var datesLoaded = 0;
+
+function pageInit(pc) {
+	var visual = "";
+	pageCode = pc;
+	
+	switch(String(pageCode)) {
+		case 'ORDERS_BY_STATUS':
+			glTittle = "Orders By Status";
+			break;
+		case 'ERROR_ORDERS':
+			glTittle = "Error Orders";
+			break;
+		case 'ORDER_DURATION':
+			glTittle = "Orders Duration";
+			break;
+		case 'TASK_BY_NAME':
+			glTittle = "User Task by Name";
+			break;
+		case 'TASK_DURATION':
+			glTittle = "User Task Duration";
+			break;
+		case 'TASK_BY_DATE':
+			glTittle = "User Task by Date";
+			break;
+		case 'TASK_ASSIGNMENT':
+			glTittle = "User Task Assignment";
+			break;
+	}
+	
+	document.title = glTittle;
+	
+	setHtmlToInfoElement("");
+	buttonRedraw();
+	drawElements();
+}
+
 function checkHeadElements() {
 	var ret = 0;
 	
-	if (pageCode == "ORDERS_BY_STATUS") {
+	if (pageCode == "ORDERS_BY_STATUS" || pageCode == "ERROR_ORDERS" || pageCode == "ORDER_DURATION") {
 		if(startDateComponent && endDateComponent && chkboxesLoaded == 1) {
 			ret = 1;
 		}
 	}
 	
-	if (pageCode == "ERROR_ORDERS") {
-		if(startDateComponent && endDateComponent && chkboxesLoaded == 1) {
-			ret = 1;
-		}
+	if (pageCode == "TASK_BY_NAME") {
+		ret = 1;
 	}
+		
 	
 	return ret;
 }
 
 function drawElements() {
 	
-	// Draw start date field
-	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
-		{
-			method:'getDateFieldModel',
-			parameters: {
-					DATE: "SD"
-			},
-			onSuccess: function(json) {
-				var jsonResponse = json.response;
-
-				if (jsonResponse) {
-					var jsonParse = JSON.parse(jsonResponse);
-					var jsonResult = jsonParse.result;
-					if (jsonResult.exeption) {
-						setHtmlToInfoElement("Communication with server failed");
-						console.log("error=" + jsonResult.exeption);
-					}
-					else {
-						//var sdFieldModel = jsonResult.model;
-						//console.log("stringify sdFieldModel="+JSON.stringify(jsonResult.model));
-						
-						var sdFieldModel = {
-							"dateFormat": jsonResult.model.dateFormat,
-							"attachToBody": jsonResult.model.attachToBody,
-							"value": jsonResult.model.value
-						};
-						
-						if (startDateComponent) {
-							startDateComponent.destroy();
-						}
-						else {
-							//sdFieldModel = {"value":"03.02.2018","attachToBody":false,"dateFormat":"DD.MM.YYYY"};
-							startDateComponent = uxNg2.createComponent(divStartDate, "UxDateFieldComponent", sdFieldModel);
-						}
-					}
-				}
-				else {
-					setHtmlToInfoElement("Communication with server failed");
-				}
-				
-			}
-		}
-	);
-
-
-	// Draw end date field
-	new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
-		{
-			method:'getDateFieldModel',
-			parameters: {
-					DATE: "ED"
-			},
-			onSuccess: function(json) {
-				var jsonResponse = json.response;
-
-				if (jsonResponse) {
-					var jsonParse = JSON.parse(jsonResponse);
-					var jsonResult = jsonParse.result;
-					if (jsonResult.exeption) {
-						setHtmlToInfoElement("Communication with server failed");
-					}
-					else {
-						//var edFieldModel = jsonResult.model;
-						//console.log("stringify edFieldModel="+JSON.stringify(jsonResult.model));
-						
-						var edFieldModel = {
-							"dateFormat": jsonResult.model.dateFormat,
-							"attachToBody": jsonResult.model.attachToBody,
-							"value": jsonResult.model.value
-						};
-						//console.log("stringify edFieldModel="+JSON.stringify(edFieldModel));
-						
-						if (endDateComponent) {
-							endDateComponent.destroy();
-						}
-						else {
-							//edFieldModel = {"value":"03.02.2018","attachToBody":false,"dateFormat":"DD.MM.YYYY"};
-							endDateComponent = uxNg2.createComponent(divEndDate, "UxDateFieldComponent", edFieldModel);
-						}
-					}
-				}
-				else {
-					setHtmlToInfoElement("Communication with server failed");
-				}
-			}
-		}
-	);
+	if (pageCode != "TASK_BY_NAME") {
 	
+		// Draw start date field
+		new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
+			{
+				method:'getDateFieldModel',
+				parameters: {
+						DATE: "SD"
+				},
+				onSuccess: function(json) {
+					var jsonResponse = json.response;
+
+					if (jsonResponse) {
+						var jsonParse = JSON.parse(jsonResponse);
+						var jsonResult = jsonParse.result;
+						if (jsonResult.exeption) {
+							setHtmlToInfoElement("Communication with server failed");
+							console.log("error=" + jsonResult.exeption);
+						}
+						else {
+							//var sdFieldModel = jsonResult.model;
+							//console.log("stringify sdFieldModel="+JSON.stringify(jsonResult.model));
+							
+							var sdFieldModel = {
+								"dateFormat": jsonResult.model.dateFormat,
+								"attachToBody": jsonResult.model.attachToBody,
+								"value": jsonResult.model.value
+							};
+							
+							if (startDateComponent) {
+								startDateComponent.destroy();
+							}
+							else {
+								//sdFieldModel = {"value":"03.02.2018","attachToBody":false,"dateFormat":"DD.MM.YYYY"};
+								startDateComponent = uxNg2.createComponent(divStartDate, "UxDateFieldComponent", sdFieldModel);
+							}
+						}
+					}
+					else {
+						setHtmlToInfoElement("Communication with server failed");
+					}
+					
+				}
+			}
+		);
+
+
+		// Draw end date field
+		new Ajax.RemoteCallJSON ('/solutions/titalia/sparkle/kpiReports/getparams.jsp',
+			{
+				method:'getDateFieldModel',
+				parameters: {
+						DATE: "ED"
+				},
+				onSuccess: function(json) {
+					var jsonResponse = json.response;
+
+					if (jsonResponse) {
+						var jsonParse = JSON.parse(jsonResponse);
+						var jsonResult = jsonParse.result;
+						if (jsonResult.exeption) {
+							setHtmlToInfoElement("Communication with server failed");
+						}
+						else {
+							//var edFieldModel = jsonResult.model;
+							//console.log("stringify edFieldModel="+JSON.stringify(jsonResult.model));
+							
+							var edFieldModel = {
+								"dateFormat": jsonResult.model.dateFormat,
+								"attachToBody": jsonResult.model.attachToBody,
+								"value": jsonResult.model.value
+							};
+							//console.log("stringify edFieldModel="+JSON.stringify(edFieldModel));
+							
+							if (endDateComponent) {
+								endDateComponent.destroy();
+							}
+							else {
+								//edFieldModel = {"value":"03.02.2018","attachToBody":false,"dateFormat":"DD.MM.YYYY"};
+								endDateComponent = uxNg2.createComponent(divEndDate, "UxDateFieldComponent", edFieldModel);
+							}
+						}
+					}
+					else {
+						setHtmlToInfoElement("Communication with server failed");
+					}
+				}
+			}
+		);
+	}
+	
+	else {
+		drawOneMoreDate();
+		drawOneMoreDate();
+		drawOneMoreDate();
+	}
+
 	initAndDrawCheckboxes();
 	initAndDrawDependents();
 };
 
+datesParams = [];
+function drawOneMoreDate() {
+	
+	var dateFieldModel = {"dateFormat":"DD.MM.YYYY","value":"03.02.2018","attachToBody":false};
+	var dateComponent = uxNg2.createComponent("#DivDate", "UxDateFieldComponent", dateFieldModel);
+	
+	datesParams.push(
+	{	
+		obj: dateComponent
+	}
+	);
+	
+}
 
 function initAndDrawCheckboxes() {
 	/* Start defining components depending on the pageCode */
@@ -150,7 +203,7 @@ function initAndDrawCheckboxes() {
 	chkboxesLoaded = 0;
 			
 	/* ORDERS_BY_STATUS */
-	if (pageCode == "ORDERS_BY_STATUS") {
+	if (pageCode == "ORDERS_BY_STATUS" || pageCode == "ERROR_ORDERS" || pageCode == "ORDER_DURATION") {
 	
 		chkboxParams.push(
 			{	state: "Uncreated",
@@ -197,26 +250,30 @@ function initAndDrawCheckboxes() {
 	
 	/* Start drawing checkboxes */
 	var chkboxLength = chkboxParams.length;
-	var cntLoadedChkboxes = 0;
-	var chkboxInterval;
-
-	for (var i = 0; i < chkboxLength; i++) {
-		drawCheckbox(i);
-	}
 	
-	/* Waiting for update finish and redraw button */
-	chkboxInterval = setInterval(function() {
-		cntLoadedChkboxes = 0;
+	if (chkboxLength > 0) {
+		var cntLoadedChkboxes = 0;
+		var chkboxInterval;
+
 		for (var i = 0; i < chkboxLength; i++) {
-			if (chkboxParams[i].state != "InProgress" && chkboxParams[i].state != "Uncreated") {
-				cntLoadedChkboxes++;
+			drawCheckbox(i);
+		}
+		
+		/* Waiting for update finish and redraw button */
+		chkboxInterval = setInterval(function() {
+			cntLoadedChkboxes = 0;
+			for (var i = 0; i < chkboxLength; i++) {
+				if (chkboxParams[i].state != "InProgress" && chkboxParams[i].state != "Uncreated") {
+					cntLoadedChkboxes++;
+				}
 			}
-		}
-		if (cntLoadedChkboxes == chkboxLength) {
-			chkboxesLoaded = 1;
-			clearInterval(chkboxInterval);
-		}
-	}, 500);
+			if (cntLoadedChkboxes == chkboxLength) {
+				chkboxesLoaded = 1;
+				clearInterval(chkboxInterval);
+			}
+		}, 500);
+	
+	}
 	
 }
 
@@ -299,8 +356,6 @@ function initAndDrawDependents() {
 			var cbStatus;
 			var cbAge;
 			
-			console.log("111");
-
 			for (var i = 0; i < chkboxLength; i++) {
 				currString = "";
 				var j = 1;
@@ -338,13 +393,11 @@ function initAndDrawDependents() {
 						}
 					}
 					
-					console.log("222");
 					
 					//console.log("stringify currCheckboxComponent="+JSON.stringify(currCheckboxComponent));
 				}
 			}
 			
-			console.log("333");
 			
 			/* Start defining components depending on the pageCode */
 			
@@ -373,7 +426,7 @@ function initAndDrawDependents() {
 					{
 						state: "Uncreated",
 						div: "#DivOrdersStatusGraph",
-						tittle: "Orders By Statuses",
+						tittle: glTittle,
 						year: startDateComponent.component.value.getFullYear(),
 						month: startDateComponent.component.value.getMonth(),
 						day: startDateComponent.component.value.getDate(),
@@ -404,7 +457,11 @@ function initAndDrawDependents() {
 							{
 								CODE: "ERROR_ORDERS",
 								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
-								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
 							},
 						obj: {}
 					}
@@ -414,7 +471,7 @@ function initAndDrawDependents() {
 					{
 						state: "Uncreated",
 						div: "#DivErrorOrdersGraph",
-						tittle: "Error Orders",
+						tittle: glTittle,
 						year: startDateComponent.component.value.getFullYear(),
 						month: startDateComponent.component.value.getMonth(),
 						day: startDateComponent.component.value.getDate(),
@@ -422,14 +479,144 @@ function initAndDrawDependents() {
 							{
 								CODE: "ERROR_ORDERS",
 								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
-								ED: toFormattedDate(endDateComponent.component.value).toJSON()
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
 							},
 						obj: {}
 					}
 				);
 				
 			}
+			
+			
+			/* ORDER_DURATION */
+			if (pageCode == "ORDER_DURATION") {
+			
+				tableParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivDurationTable1",
+						JSONParams: 
+							{
+								CODE: "ORDER_DURATION1",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
+							},
+						obj: {}
+					}
+				);
+				
+				tableParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivDurationTable2",
+						JSONParams: 
+							{
+								CODE: "ORDER_DURATION2",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
+							},
+						obj: {}
+					}
+				);
+				
+				graphParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivDurationGraph1",
+						tittle: glTittle,
+						year: startDateComponent.component.value.getFullYear(),
+						month: startDateComponent.component.value.getMonth(),
+						day: startDateComponent.component.value.getDate(),
+						JSONParams: 
+							{
+								CODE: "ORDER_DURATION1",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
+							},
+						obj: {}
+					}
+				);
+				
+				graphParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivDurationGraph2",
+						tittle: glTittle + " (%)",
+						year: startDateComponent.component.value.getFullYear(),
+						month: startDateComponent.component.value.getMonth(),
+						day: startDateComponent.component.value.getDate(),
+						JSONParams: 
+							{
+								CODE: "ORDER_DURATION2",
+								SD: toFormattedDate(startDateComponent.component.value).toJSON(),
+								ED: toFormattedDate(endDateComponent.component.value).toJSON(),
+								CFS_TYPE: cbCFS,
+								BUSINESS_SCENARIO: cbBS,
+								STATUS: cbStatus,
+								AGE: cbAge
+							},
+						obj: {}
+					}
+				);
+				
+			}
+
+			/* TASK_BY_NAME */
+			if (pageCode == "TASK_BY_NAME") {
+				
+				var currComponent;
+				var currString = "";
+				
+				var currLength = datesParams.length;
+				var j = 1;
+				
+				for (var i = 0; i < currLength; i++) {
+					currComponent = datesParams[i].obj.component;
+					if (currComponent.value) {
+						currString = currString + toFormattedDate(currComponent.value);
+						if (currLength > j) {
+							currString = currString + ",";
+						}
+						j++;
+					}
+				}
+				console.log("currString="+currString);
+			
+				tableParams.push(
+					{
+						state: "Uncreated",
+						div: "#DivTaskByNameTable",
+						JSONParams: 
+							{
+								CODE: "TASK_BY_NAME",
+								DATES: currString
+							},
+						obj: {}
+					}
+				);
+				
+			}
+			
 			/*  */
+			
+			
+			
 
 			clearInterval(paramsIntervalId);
 			drawDependentElements();
@@ -564,20 +751,31 @@ function drawTable(index) {
 						//tableComponent.update();
 						
 						//console.log("UxSortTypes="+UxSortTypes);
-						
+						/*
 						tableComponent.component.customSortFunction = function(a,b,columnIndex,sortType)
 						{
 							console.log("sort111111");
-							let result;
-							if (a.id < b.id) {
-									result = -1;
-							} else if (a.id > b.id) {
-									result =  1;
-							} else {
-									result =  0;
+							
+							if (columnIndex == 0) {
+							
+								console.log("a"+a);
+								console.log("b="+b);
+								console.log("columnIndex="+columnIndex);
+								console.log("sortType="+sortType);
+								
+								//.columns[0].value
+								//new Date('2011-04-11T10:20:30Z')
+								let result;
+								if (a.columns[0].value < b.columns[0].value) {
+										result = -1;
+								} else if (a.id > b.id) {
+										result =  1;
+								} else {
+										result =  0;
+								}
+								return result;
 							}
-							return result;
-						}
+						}*/
 						
 						/*
 						this.tableComponent.customSortFunction = (
@@ -587,7 +785,7 @@ function drawTable(index) {
 							/*Index of clicked column header. Or when table update() method happens table
 							starts to check  column.sort for each header column and in case of
 							column.sort = "asc" | "desc" triggers sorting for this column;*/
-	/*						columnIndex: number,
+							/*columnIndex: number,
 							sortType: UxSortTypes //current column.sort type
 						) => {
 							let result;

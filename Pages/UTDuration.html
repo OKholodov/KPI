@@ -98,26 +98,6 @@
 												<tbody>
 													<tr>
 														<td style="vertical-align: middle; width: 5%;">
-															<div style="font-size: 14px; width: 130px;">Start date</div>
-														</td>
-														<td style="vertical-align: middle; width: 10%;">
-															<span class="nc-param-value" style="margin-left:0px;">
-																<table class="VisualValueTable">
-																	<tbody>
-																		<tr class="line">
-																			<td class="text">
-																				<div id="DivStartDate" style="width: 130px;" ></div>
-																			</td>
-																		</tr>
-																	</tbody>
-																</table>
-															</span>
-														</td>
-														<!--td style="width: 5%;">&nbsp;</td>
-														<td style="width: 5%;">&nbsp;</td> -->
-													</tr>
-													<tr>
-														<td style="vertical-align: middle; width: 5%;">
 															<div style="font-size: 14px; width: 130px;">End date</div>
 														</td>
 														<td style="vertical-align: middle;">
@@ -126,7 +106,7 @@
 																	<tbody>
 																		<tr class="line">
 																			<td class="text">
-																				<div id="DivEndDate" style="width: 130px;"></div>
+																				<div id="DivDate" style="width: 130px;"></div>
 																			</td>
 																		</tr>
 																	</tbody>
@@ -135,24 +115,7 @@
 														</td>
 													</tr>
 													
-													<tr>
-														<td style="vertical-align: middle; width: 5%;">
-															<div style="font-size: 14px; width: 130px;">Age class</div>
-														</td>
-														<td style="vertical-align: top; width: 10%;">
-															<span class="nc-param-value" style="margin-left:0px;">
-																<table class="VisualValueTable">
-																	<tbody>
-																		<tr class="line">
-																			<td class="text">
-																				<div id="AgeChkBox" style="width: 150px;" ></div>
-																			</td>
-																		</tr>
-																	</tbody>
-																</table>
-															</span>
-														</td>
-													</tr>
+												
 													
 												</tbody>
 											</table>
@@ -266,28 +229,12 @@
 				<div class="titleCorner"></div>
 			</div>
 		</div>
-    <div id="DivOrdersStatusGraph" style="width: 90%;" class="ux-graph"></div>
+		<div id="DivTaskByName" style="width: 90%;" class="ux-table"></div>
 
-		<div class="TitleTabLeft">
-			<div class="TitleTabRight">
-				<table cellpadding="0" cellspacing="0" border="0" class="TitleTab">
-					<tbody>
-						<tr>
-							<td></td>
-							<!--<td class="nowrap">Orders by Status</td>-->
-						</tr>
-					</tbody>
-				</table>
-				<div class="titleCorner"></div>
-			</div>
-		</div>
-		<div style="width: 90%;">
-			<div id="DivOrdersStatusTable" class="ux-table" style="margin-bottom: 30px"></div>
-		</div>
 
 		<script type='text/javascript'>
 			setTimeout(function() {
-				pageInit("ORDERS_BY_STATUS");
+				pageInit("TASK_BY_NAME");
 			}, 500);
 		</script>
 		

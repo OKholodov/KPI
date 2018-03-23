@@ -44,13 +44,15 @@ create table kpi_orders
   age_class varchar2(100),
   order_sum number,
   error_sum number,
-  ord_duration_less_10min number(10),
-  ord_duration_less_1hour number(10),
-  ord_duration_less_1day number(10),
-  ord_duration_less_1week number(10),
-  ord_duration_less_3week number(10),
-  ord_duration_later_3week number(10)
+  ORD_DURATION_LESS_5DAYS number(10),
+  ORD_DURATION_LESS_10DAYS number(10),
+  ORD_DURATION_LESS_20DAYS number(10),
+  ORD_DURATION_LESS_40DAYS number(10),
+  ORD_DURATION_LESS_60DAYS number(10),
+  ORD_DURATION_LATER_60DAYS number(10)
 );
+
+create index ind_kpi_ord_ed on kpi_orders (execution_date);
 
 create table kpi_user_tasks
 (

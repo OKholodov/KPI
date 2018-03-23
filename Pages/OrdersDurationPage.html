@@ -3,24 +3,51 @@
   <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Webpack Bundle Analyzer</title>
-    <link rel="stylesheet" id="themeStyleSheet" href="/ux-ng2-embedded-components/0.0.2/assets/base.css">
-		<link rel="stylesheet" id="themeStyleSheet" href="/solutions/titalia/sparkle/kpiReports/kpiReportsCustom.css">
+	
+	<script src="/scripts/prototype.js"></script>
+	<script>
+		Function.prototype.bind = function(oThis) {
+			if (typeof this !== 'function') {
+				throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+			}
+			var aArgs = Array.prototype.slice.call(arguments, 1),
+				 fToBind = this,
+				 fNOP    = function() {},
+				 fBound  = function() {
+				 return fToBind.apply(this instanceof fNOP
+							   ? this
+							   : oThis,
+					   aArgs.concat(Array.prototype.slice.call(arguments)));
+				 };
+			if (this.prototype) {
+			  // Function.prototype doesn't have a prototype property
+			  fNOP.prototype = this.prototype;
+			}
+			fBound.prototype = new fNOP();
+			return fBound;
+		};
+	</script>
+	<script type='text/javascript'>
+		/* 	Fix the problem in prototype.js
+			Line: var query = document.evaluate(expression, $(parentElement) || document,
+		*/
+		document._getElementsByXPath = function(expression, parentElement) {
+			var results = [];
+			var query = document.evaluate(expression, document,
+				null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+			for (var i = 0, length = query.snapshotLength; i < length; i++)
+				results.push(query.snapshotItem(i));
+			return results;
+		};
+	</script>
+	
+	<script src="/scripts/rjRPC.js"></script>
+	<script src="/scripts/jquery.js"></script>
 		
-		<script type='text/javascript' src='/ux-ng2-embedded-components/0.0.2/ng-app.js'></script>
-		<script type='text/javascript' src='/solutions/titalia/sparkle/kpiReports/getparams.js'></script>
-		<script src="/scripts/rjRPC.js"></script>
-		
-		<!--	
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/highcharts-more.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/exporting.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/no-data-to-display.js"></script>
-		<script type="text/javascript" src="/dashboard/scripts/highchartslang_rev5895.js"></script>
-		<script type="text/javascript" src="/thirdparty/highsoft/highcharts/4.1.4/modules/drilldown.js"></script>
-		<script type="text/javascript" src="/dashboard/scripts/drilldown_rev5895.js"></script>
-		 <script type="text/javascript" src="/dashboard/scripts/highcharts-autoparams.js"></script> 
-		 -->
+	<link rel="stylesheet" href="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/styles.bundle.css" />
+	<link rel="stylesheet" href="/solutions/titalia/sparkle/kpiReports/kpiReportsCustom.css">
+	
+
   </head>
 	<body>
 		
@@ -57,100 +84,185 @@
 										</td>
 									</tr>
 								</tbody>
-								<tbody >
+								<tbody>
 									<tr>
-										<td style="vertical-align: middle; width: 5%;">
-											<div style="font-size: 14px; width: 130px;">Start date</div>
+									<td style="vertical-align: top; width: 70%;">
+									<table  style="width: 50%; border-top:0px;" cellpadding="0" cellspacing="0" border="0">
+									<tr>
+									
+									
+									
+										<td style="vertical-align: top; width: 1%;">
+											<table  style="width: 100%; border-top:0px;" cellpadding="0" cellspacing="0" border="0">
+												<tbody>
+													<tr>
+														<td style="vertical-align: middle; width: 5%;">
+															<div style="font-size: 14px; width: 130px;">Start date</div>
+														</td>
+														<td style="vertical-align: middle; width: 10%;">
+															<span class="nc-param-value" style="margin-left:0px;">
+																<table class="VisualValueTable">
+																	<tbody>
+																		<tr class="line">
+																			<td class="text">
+																				<div id="DivStartDate" style="width: 130px;" ></div>
+																			</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</span>
+														</td>
+														<!--td style="width: 5%;">&nbsp;</td>
+														<td style="width: 5%;">&nbsp;</td> -->
+													</tr>
+													<tr>
+														<td style="vertical-align: middle; width: 5%;">
+															<div style="font-size: 14px; width: 130px;">End date</div>
+														</td>
+														<td style="vertical-align: middle;">
+															<span class="nc-param-value" style="margin-left:0px;">
+																<table class="VisualValueTable">
+																	<tbody>
+																		<tr class="line">
+																			<td class="text">
+																				<div id="DivEndDate" style="width: 130px;"></div>
+																			</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</span>
+														</td>
+													</tr>
+													
+													<tr>
+														<td style="vertical-align: middle; width: 5%;">
+															<div style="font-size: 14px; width: 130px;">Age class</div>
+														</td>
+														<td style="vertical-align: top; width: 10%;">
+															<span class="nc-param-value" style="margin-left:0px;">
+																<table class="VisualValueTable">
+																	<tbody>
+																		<tr class="line">
+																			<td class="text">
+																				<div id="AgeChkBox" style="width: 150px;" ></div>
+																			</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</span>
+														</td>
+													</tr>
+													
+												</tbody>
+											</table>
 										</td>
-										<td style="vertical-align: middle;">
+										
+										<td style="vertical-align: top; width: 1%;">
 											<span class="nc-param-value" style="margin-left:0px;">
 												<table class="VisualValueTable">
 													<tbody>
 														<tr class="line">
 															<td class="text">
-																<div id="DivStartDate" style="width: 130px;" ></div>
+																<fieldset>
+																	<legend class=".ux-checkbox-field__label" style="font-size: 14px;">Business Scenario</legend>
+																	<div id="BSChkBox" style="width: 200px;" ></div>
+																</fieldset>
 															</td>
 														</tr>
 													</tbody>
 												</table>
 											</span>
 										</td>
-										<!--td style="width: 5%;">&nbsp;</td>
-										<td style="width: 5%;">&nbsp;</td> -->
-									</tr>
-									<tr>
-										<td style="vertical-align: middle; width: 5%;">
-											<div style="font-size: 14px; width: 130px;">End date</div>
-										</td>
-										<td style="vertical-align: middle;">
+										
+										<td style="vertical-align: top; width: 1%;">
 											<span class="nc-param-value" style="margin-left:0px;">
 												<table class="VisualValueTable">
 													<tbody>
 														<tr class="line">
 															<td class="text">
-																<div id="DivEndDate" style="width: 130px;"></div>
+																<fieldset>
+																	<legend class=".ux-checkbox-field__label" style="font-size: 14px;">CFS Type</legend>
+																	<div id="CFSTypesChkBox" style="width: 230px;" ></div>
+																</fieldset>
 															</td>
 														</tr>
 													</tbody>
 												</table>
 											</span>
 										</td>
+										
+										<td style="vertical-align: top; width: 1%;">
+											<span class="nc-param-value" style="margin-left:0px;">
+												<table class="VisualValueTable">
+													<tbody>
+														<tr class="line">
+															<td class="text">
+																<fieldset>
+																	<legend class=".ux-checkbox-field__label" style="font-size: 14px;">Status</legend>
+																	<div id="StatusChkBox" style="width: 120px;" ></div>
+																</fieldset>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</span>
+										</td>
+										
+										<!--
+										<td style="vertical-align: top; width: 10%;">
+											<span class="nc-param-value" style="margin-left:0px;">
+												<table class="VisualValueTable">
+													<tbody>
+														<tr class="line">
+															<td class="text">
+																<div id="AgeChkBox" style="width: 150px;" ></div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</span>
+										</td>
+										-->
 									</tr>
+									
+									</table>
+										</td>
+									</tr>
+										
+									
 								</tbody>
 							</table>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-		<div id="DivChkBox"></div>
-		<div class="TitleTabLeft">
-			<div class="TitleTabRight">
-				<table cellpadding="0" cellspacing="0" border="0" class="TitleTab">
-					<tbody>
-						<tr>
-							<td></td>
-							<td class="nowrap"></td>
-						</tr>
-					</tbody>
-				</table>
-				<div class="titleCorner"></div>
-			</div>
-		</div>
-    <div id="DivOrdersStatusGraph" style="width: 80%;" class="ux-graph"></div>
+		
 
-		<div class="TitleTabLeft">
-			<div class="TitleTabRight">
-				<table cellpadding="0" cellspacing="0" border="0" class="TitleTab">
-					<tbody>
-						<tr>
-							<td></td>
-							<td class="nowrap">Orders by Status</td>
-						</tr>
-					</tbody>
-				</table>
-				<div class="titleCorner"></div>
-			</div>
+
+		<div class="row">
+		  <div class="column">
+			<div id="DivDurationGraph1" class="ux-graph"></div>
+		  </div>
+		  <div class="column">
+			<div id="DivDurationGraph2" class="ux-graph"></div>
+		  </div>
 		</div>
-		<div style="width: 80%;">
-			<div id="DivOrdersStatusTable" class="ux-table" style="margin-bottom: 30px"></div>
+
+		<div class="row">
+		  <div class="column">
+			<div id="DivDurationTable1" class="ux-table"></div>
+		  </div>
+		  <div class="column">
+			<div id="DivDurationTable2" class="ux-table"></div>
+		  </div>
 		</div>
-		
+
+		<script src="/ux-ng2-embedded-components/uxNg2_embeddded_0.05/dist/main.bundle.js"></script>
+		<script type='text/javascript' src='/solutions/titalia/sparkle/kpiReports/getparams.js'></script>
 		<script type='text/javascript'>
-			/* 	Fix the problem in prototype.js
-					Line: var query = document.evaluate(expression, $(parentElement) || document,
-			*/
-			document._getElementsByXPath = function(expression, parentElement) {
-				var results = [];
-				var query = document.evaluate(expression, document,
-					null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-				for (var i = 0, length = query.snapshotLength; i < length; i++)
-					results.push(query.snapshotItem(i));
-				return results;
-			};
-		</script>
-		
-		<script type='text/javascript'>
-			pageInit("ORDERS_BY_STATUS");
+			setTimeout(function() {
+				pageInit("ORDER_DURATION");
+			}, 500);
 		</script>
 		
 	</body>

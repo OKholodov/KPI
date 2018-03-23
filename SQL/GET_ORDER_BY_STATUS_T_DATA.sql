@@ -1,7 +1,7 @@
 select q'<{ 
 "id": >' || rownum || q'<,
 "columns": [
-{"value": ">' || ed || q'<" },
+{"value": ">' || to_char(ed,'YYYY-MM-DD') || q'<" },
 {"value": ">' || Suspended || q'<" },
 {"value": ">' || Cancelled || q'<" },
 {"value": ">' || Completed || q'<" },

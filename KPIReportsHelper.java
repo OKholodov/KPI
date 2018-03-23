@@ -26,22 +26,31 @@ import com.netcracker.solutions.titalia.sparkle.kpiReports.KPISQLData;
 
 public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 {
-    public static final String SQLFILE_GET_ORDER_BY_STATUS_T_HEAD  = "GET_ORDER_BY_STATUS_T_HEAD";
-    public static final String SQLFILE_GET_ORDER_BY_STATUS_T_DATA  = "GET_ORDER_BY_STATUS_T_DATA";
-
-    public static final String SQLFILE_GET_ORDER_BY_STATUS_G_DATA  = "GET_ORDER_BY_STATUS_G_DATA";
-    public static final String SQLFILE_GET_ERR_G_DATA  = "GET_ERR_G_DATA";
-
-    public static final String SQLFILE_GET_ERR_T_HEAD  = "GET_ERR_ORDER_T_HEAD";
-    public static final String SQLFILE_GET_ERR_T_DATA  = "GET_ERR_ORDER_T_DATA";
-
-    public static final String SQLFILE_GET_START_DATE_DATA  = "GET_START_DATE_DATA";
+	public static final String SQLFILE_GET_START_DATE_DATA  = "GET_START_DATE_DATA";
     public static final String SQLFILE_GET_END_DATE_DATA  = "GET_END_DATE_DATA";
-	
 	public static final String SQLFILE_GET_CFS_TYPES_CB_DATA  = "GET_CFS_TYPES_CB_DATA";
 	public static final String SQLFILE_GET_BUSINESS_SCENARIO_CB_DATA  = "GET_BUSINESS_SCENARIO_CB_DATA";
 	public static final String SQLFILE_GET_STATUS_CB_DATA  = "GET_STATUS_CB_DATA";
 	public static final String SQLFILE_GET_AGE_CB_DATA  = "GET_AGE_CB_DATA";
+	
+    public static final String SQLFILE_GET_ORDER_BY_STATUS_T_HEAD  = "GET_ORDER_BY_STATUS_T_HEAD";
+    public static final String SQLFILE_GET_ORDER_BY_STATUS_T_DATA  = "GET_ORDER_BY_STATUS_T_DATA";
+    public static final String SQLFILE_GET_ORDER_BY_STATUS_G_DATA  = "GET_ORDER_BY_STATUS_G_DATA";
+	
+    public static final String SQLFILE_GET_ERR_G_DATA  = "GET_ERR_G_DATA";
+    public static final String SQLFILE_GET_ERR_T_HEAD  = "GET_ERR_ORDER_T_HEAD";
+    public static final String SQLFILE_GET_ERR_T_DATA  = "GET_ERR_ORDER_T_DATA";
+	
+	public static final String SQLFILE_GET_DURATION_G_DATA  = "GET_ORDER_DURATION_G_DATA";
+	public static final String SQLFILE_GET_DURATION_T_HEAD  = "GET_ORDER_DURATION_T_HEAD";
+    public static final String SQLFILE_GET_DURATION_T_DATA  = "GET_ORDER_DURATION_T_DATA";
+	
+	public static final String SQLFILE_GET_DURATION2_G_DATA  = "GET_ORDER_DURATION2_G_DATA";
+	public static final String SQLFILE_GET_DURATION2_T_HEAD  = "GET_ORDER_DURATION2_T_HEAD";
+    public static final String SQLFILE_GET_DURATION2_T_DATA  = "GET_ORDER_DURATION2_T_DATA";
+	
+	public static final String SQLFILE_GET_TASK_BY_NAME_T_HEAD  = "GET_TASK_BY_NAME_T_HEAD";
+    public static final String SQLFILE_GET_TASK_BY_NAME_T_DATA  = "GET_TASK_BY_NAME_T_DATA";
 
     private static final Logger LOG = LoggerFactory.getLogger(KPIReportsHelper.class);
 
@@ -210,6 +219,8 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 		String cbBS;
 		String cbStatus;
 		String cbAge;
+		
+		String dates;
 
         String headerSql = "";
         String bodySql = "";
@@ -224,13 +235,31 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 
         try
         {
+			Object[] tableFilter = new Object[0];
+			Object[] tableFilterHead = new Object[0];
             code = ((String) params.get("CODE")).replace("\"","");
-            SD = ((String) params.get("SD")).replace("\"","");
-            ED = ((String) params.get("ED")).replace("\"","");
-			cbCFS = ((String) params.get("CFS_TYPE")).replace("\"","");
-			cbBS = ((String) params.get("BUSINESS_SCENARIO")).replace("\"","");
-			cbStatus = ((String) params.get("STATUS")).replace("\"","");
-			cbAge = ((String) params.get("AGE")).replace("\"","");
+			
+			if ("ORDERS_BY_STATUS".equals(code) || 
+				"ERROR_ORDERS".equals(code) || 
+				"ORDER_DURATION1".equals(code) || 
+				"ORDER_DURATION2".equals(code)
+			) {
+				SD = ((String) params.get("SD")).replace("\"","");
+				ED = ((String) params.get("ED")).replace("\"","");
+				cbCFS = ((String) params.get("CFS_TYPE")).replace("\"","");
+				cbBS = ((String) params.get("BUSINESS_SCENARIO")).replace("\"","");
+				cbStatus = ((String) params.get("STATUS")).replace("\"","");
+				cbAge = ((String) params.get("AGE")).replace("\"","");
+				
+				tableFilter = new Object[]{SD, ED, cbCFS, cbBS, cbStatus, cbAge};
+			}
+			
+			if ("TASK_BY_NAME".equals(code)) {
+				
+				dates = ((String) params.get("DATES")).replace("\"","");
+				tableFilter = new Object[]{dates};
+				tableFilterHead = new Object[]{dates};
+			}
 /*
             LOG.debug("code = " + code);
             LOG.debug("SD = " + SD);
@@ -246,10 +275,21 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
                     headerSql = SQLFILE_GET_ERR_T_HEAD;
                     bodySql = SQLFILE_GET_ERR_T_DATA;
                     break;
+				case "ORDER_DURATION1":
+                    headerSql = SQLFILE_GET_DURATION_T_HEAD;
+                    bodySql = SQLFILE_GET_DURATION_T_DATA;
+                    break;
+				case "ORDER_DURATION2":
+                    headerSql = SQLFILE_GET_DURATION2_T_HEAD;
+                    bodySql = SQLFILE_GET_DURATION2_T_DATA;
+                    break;
+				case "TASK_BY_NAME":
+                    headerSql = SQLFILE_GET_TASK_BY_NAME_T_HEAD;
+                    bodySql = SQLFILE_GET_TASK_BY_NAME_T_DATA;
+                    break;
             }
 
-
-            Object[] tableFilter = new Object[]{SD, ED, cbCFS, cbBS, cbStatus, cbAge};
+            
             StringBuilder outputString = new StringBuilder();
 
             //outputString = getTableModel(SQLFILE_GET_ORDER_BY_STATUS_T_HEAD, SQLFILE_GET_ORDER_BY_STATUS_T_DATA, tableFilter);
@@ -264,7 +304,12 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
                     "      \"rows\": ["
             );
 
-            List<KPISQLData> getTableHeader = KPISQLData.getData(findSQL(headerSql));
+			List<KPISQLData> getTableHeader;
+			if (tableFilterHead.length == 0)
+				getTableHeader = KPISQLData.getData(findSQL(headerSql));
+			else
+				getTableHeader = KPISQLData.getData(findSQL(headerSql),tableFilterHead);
+			
             if (getTableHeader.size() == 1) {
                 outputString.append(getTableHeader.get(0).data + "\n");
             }
@@ -281,37 +326,40 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
 
             // Model body
             List<KPISQLData> rows;
-            rows = KPISQLData.getData(findSQL(bodySql),tableFilter);
+			
+			if (tableFilter.length != 0) {
+				rows = KPISQLData.getData(findSQL(bodySql),tableFilter);
 
-            if (rows.size() < 1) {existRows = false;}
+				if (rows.size() < 1) {existRows = false;}
 
-            if (existRows) {
-                outputString.append(
-                        ", \"body\": {\n" +
-                        "    \"rows\": [\n"
-                );
+				if (existRows) {
+					outputString.append(
+							", \"body\": {\n" +
+							"    \"rows\": [\n"
+					);
 
-				int i = 0;
-				for (KPISQLData sqlData : rows) {
-					outputString.append(sqlData.data + "\n");
-					if (i < (rows.size() - 1)) {
-						outputString.append(", ");
+					int i = 0;
+					for (KPISQLData sqlData : rows) {
+						outputString.append(sqlData.data + "\n");
+						if (i < (rows.size() - 1)) {
+							outputString.append(", ");
+						}
+						i++;
 					}
-					i++;
-				}
 
-				outputString.append(
-						"\n    ]\n" +
-						"    }\n" +
-						"  }\n"+
-						"};"
-				);
-			}
-			else {
-				outputString.append(
-						"  }\n"+
-						"};"
-				);
+					outputString.append(
+							"\n    ]\n" +
+							"    }\n" +
+							"  }\n"+
+							"};"
+					);
+				}
+				else {
+					outputString.append(
+							"  }\n"+
+							"};"
+					);
+				}
 			}
 
             /* ************************************ End Constructing model ************************************ */
@@ -378,6 +426,12 @@ public class KPIReportsHelper extends com.netcracker.jsp.JsonDispatcherPage
                     break;
                 case "ERROR_ORDERS":
                     bodySql = SQLFILE_GET_ERR_G_DATA;
+                    break;
+				case "ORDER_DURATION1":
+                    bodySql = SQLFILE_GET_DURATION_G_DATA;
+                    break;
+				case "ORDER_DURATION2":
+                    bodySql = SQLFILE_GET_DURATION2_G_DATA;
                     break;
             }
 
