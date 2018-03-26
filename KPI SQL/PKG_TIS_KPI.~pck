@@ -256,7 +256,7 @@ IS
     
     dbms_output.put_line('Body=' || v_body);
  
-    OPEN cur FOR v_body /*q'[SELECT 'asd' as t FROM dual ]'*/ ;
+    OPEN cur FOR v_body ;
     
     LOOP
       FETCH cur INTO tp;
@@ -268,15 +268,6 @@ IS
     
     RETURN;
     
-    /*
-    open c for 'select * from t';
-  7    loop
-  8      fetch c bulk collect into xx limit 100;
-  9      dbms_output.put_line(xx.count);
- 10      exit when c%notfound;
- 11    end loop;
- 12    close c;
-    */
   END get_ut_by_name;
   
 

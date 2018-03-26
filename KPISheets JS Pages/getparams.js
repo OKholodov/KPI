@@ -25,7 +25,7 @@ var graphParams; //Array of UxGraphsObjects and their parameters
 var chkboxParams; //Array of checkbox groups and their parameters
 var chkboxesLoaded = 0;
 
-var datesParams; //Array of date fields and their parameters
+var datesParams = []; //Array of date fields and their parameters
 var datesLoaded = 0;
 
 function pageInit(pc) {
@@ -58,7 +58,7 @@ function pageInit(pc) {
 	
 	document.title = glTittle;
 	
-	setHtmlToInfoElement("");
+	setHtmlToAttribute ("KPIInfoContent","");
 	buttonRedraw();
 	drawElements();
 }
@@ -98,7 +98,7 @@ function drawElements() {
 						var jsonParse = JSON.parse(jsonResponse);
 						var jsonResult = jsonParse.result;
 						if (jsonResult.exeption) {
-							setHtmlToInfoElement("Communication with server failed");
+							setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 							console.log("error=" + jsonResult.exeption);
 						}
 						else {
@@ -121,7 +121,7 @@ function drawElements() {
 						}
 					}
 					else {
-						setHtmlToInfoElement("Communication with server failed");
+						setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 					}
 					
 				}
@@ -143,7 +143,7 @@ function drawElements() {
 						var jsonParse = JSON.parse(jsonResponse);
 						var jsonResult = jsonParse.result;
 						if (jsonResult.exeption) {
-							setHtmlToInfoElement("Communication with server failed");
+							setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 						}
 						else {
 							//var edFieldModel = jsonResult.model;
@@ -166,7 +166,7 @@ function drawElements() {
 						}
 					}
 					else {
-						setHtmlToInfoElement("Communication with server failed");
+						setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 					}
 				}
 			}
@@ -174,8 +174,18 @@ function drawElements() {
 	}
 	
 	else {
-		drawOneMoreDate();
-		drawOneMoreDate();
+		setHtmlToAttribute ("DivAddDateBtn", getAddDateButtonHtml());
+		setHtmlToAttribute ("DivDeleteDateBtn", getDeleteDateButtonHtml());
+		setHtmlToAttribute ("DivClearDateBtn", getClearDateButtonHtml());
+		
+		var mday = new Date();
+		mday.setMonth(mday.getMonth() - 1);
+		drawOneMoreDate(toFormattedDate(mday));
+		
+		var fortnight = new Date();
+		fortnight.setDate(fortnight.getDate() - 14);
+		drawOneMoreDate(toFormattedDate(fortnight));
+		
 		drawOneMoreDate();
 	}
 
@@ -183,16 +193,48 @@ function drawElements() {
 	initAndDrawDependents();
 };
 
-datesParams = [];
-function drawOneMoreDate() {
+function addDate() {
+	drawOneMoreDate();
+}
+function deleteDate() {
+  var currDate;
+	currDate = datesParams.pop();
+	if (currDate) {
+		currDate.obj.destroy();
+	}
+}
+function clearDates() {
+	var currDate;
 	
-	var dateFieldModel = {"dateFormat":"DD.MM.YYYY","value":"03.02.2018","attachToBody":false};
+	datesParams.forEach(function(element) {
+		if (element.obj) {
+			element.obj.destroy();
+		}
+	});
+	
+	datesParams = [];
+}
+
+function drawOneMoreDate(date) {
+
+	var dateFieldModel;
+	
+	if (date) {
+		dateFieldModel = {"dateFormat":"DD.MM.YYYY","value": date,"attachToBody":false};
+	}
+	else {
+		var ystd = new Date();
+		ystd.setDate(ystd.getDate() - 1);
+		ystd = toFormattedDate(ystd);
+		dateFieldModel = {"dateFormat":"DD.MM.YYYY","value": ystd,"attachToBody":false};
+	}
+
 	var dateComponent = uxNg2.createComponent("#DivDate", "UxDateFieldComponent", dateFieldModel);
 	
 	datesParams.push(
-	{	
-		obj: dateComponent
-	}
+		{	
+			obj: dateComponent
+		}
 	);
 	
 }
@@ -279,7 +321,7 @@ function initAndDrawCheckboxes() {
 
 function drawCheckbox(index) {
 	if (!chkboxParams[index]) {
-		setHtmlToInfoElement("Communication with server failed");
+		setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 		return;
 	}
 	chkboxParams[index].state = "InProgress";
@@ -302,7 +344,7 @@ function drawCheckbox(index) {
 					var jsonResult = jsonParse.result;
 					if (jsonResult.exeption) {
 						chkboxParams[index].state = "Error";
-						setHtmlToInfoElement("Communication with server failed");
+						setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 					}
 					else {
 						if (checkBoxComponent.component) {
@@ -317,7 +359,7 @@ function drawCheckbox(index) {
 				}
 				else {
 					chkboxParams[index].state = "Error";
-					setHtmlToInfoElement("Communication with server failed");
+					setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 				}
 				chkboxParams[index].state = "Created";
 			}
@@ -597,19 +639,24 @@ function initAndDrawDependents() {
 					}
 				}
 				console.log("currString="+currString);
-			
-				tableParams.push(
-					{
-						state: "Uncreated",
-						div: "#DivTaskByNameTable",
-						JSONParams: 
-							{
-								CODE: "TASK_BY_NAME",
-								DATES: currString
-							},
-						obj: {}
-					}
-				);
+				
+				if (currString.length > 1) {
+					tableParams.push(
+						{
+							state: "Uncreated",
+							div: "#DivTaskByNameTable",
+							JSONParams: 
+								{
+									CODE: "TASK_BY_NAME",
+									DATES: currString
+								},
+							obj: {}
+						}
+					);
+				}
+				else {
+					setHtmlToAttribute ("KPIInfoContent", "Please add at least one date");
+				}
 				
 			}
 			
@@ -648,9 +695,9 @@ function destroyDependentElements() {
 }
 
 function clickButton () {
-	setHtmlToInfoElement("");
+	setHtmlToAttribute ("KPIInfoContent", "");
 	clearInterval(paramsIntervalId);
-	setHtmlToAttribute(getLoadingButtonHtml());
+	setHtmlToAttribute("UpdateButton", getLoadingButtonHtml());
 	
 	destroyDependentElements();
 	initAndDrawDependents();
@@ -698,7 +745,7 @@ function drawDependentElements() {
 
 function drawTable(index) {
 	if (!tableParams[index]) {
-		setHtmlToInfoElement("Communication with server failed");
+		setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 		return;
 	}
 	tableParams[index].state = "InProgress";
@@ -730,7 +777,7 @@ function drawTable(index) {
 					jsonResult = jsonParse.result;
 					
 					if (jsonResult.exeption) {
-						setHtmlToInfoElement("Communication with server failed");
+						setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 						tableParams[index].state = "Error";
 					}
 					else {
@@ -802,7 +849,7 @@ function drawTable(index) {
 					}
 				}
 				else {
-					setHtmlToInfoElement("Communication with server failed");
+					setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 					tableParams[index].state = "Error";
 				}
 				tableParams[index].state = "Created";
@@ -813,7 +860,7 @@ function drawTable(index) {
 
 function drawGraph(index) {
 	if (!graphParams[index]) {
-		setHtmlToInfoElement("Communication with server failed");
+		setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 		return;
 	}
 	
@@ -905,7 +952,7 @@ function drawGraph(index) {
 					jsonResult = jsonParse.result;
 					
 					if (jsonResult.exeption) {
-						setHtmlToInfoElement("Communication with server failed");
+						setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 						graphParams[index].state = "Error";
 					}
 					else {
@@ -919,7 +966,7 @@ function drawGraph(index) {
 					}
 				}
 				else {
-					setHtmlToInfoElement("Communication with server failed");
+					setHtmlToAttribute ("KPIInfoContent", "Communication with server failed");
 					graphParams[index].state = "Error";
 				}
 				graphParams[index].state = "Created";
@@ -973,7 +1020,7 @@ function toFormattedDate(vdate) {
 function buttonRedraw() {
 	var visual = "";
 	visual += getButtonHtml();
-	setHtmlToAttribute(visual);
+	setHtmlToAttribute("UpdateButton", visual);
 }
 
 function getButtonHtml(){
@@ -1037,9 +1084,184 @@ function getLoadingButtonHtml(){
     return html;
 }
 
-function setHtmlToAttribute (html){
-	document.getElementById('UpdateButton').innerHTML=html;
+function getAddDateButtonHtml(){
+    var html = "<a href=\"#\" onclick=\"addDate()\"><img src=\"data:image/gif;base64," +
+		"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\" width=\"32\" height=\"32\"></a>";
+		
+		return html;
 }
-function setHtmlToInfoElement (html){
-	document.getElementById('KPIInfoContent').innerHTML=html;
+
+function getDeleteDateButtonHtml(){
+    var html = "<a href=\"#\" onclick=\"deleteDate()\"><img src=\"data:image/gif;base64," +
+		"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" +
+		"AVACoC6ivwcA88L0kd9TRb4AAAAASUVORK5CYII=\" width=\"32\" height=\"32\"></a>";
+		
+		return html;
+}
+
+function getClearDateButtonHtml(){
+    var html = "<a href=\"#\" onclick=\"clearDates()\"><img src=\"data:image/gif;base64," +
+		"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" +
+		"Kgf13QBUkPcC5/7pPAAAAABJRU5ErkJggg==\" width=\"32\" height=\"32\"></a>";
+		
+		return html;
+}
+
+function setHtmlToAttribute (id, html){
+	document.getElementById(id).innerHTML=html;
 }
