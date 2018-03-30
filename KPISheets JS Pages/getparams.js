@@ -93,6 +93,7 @@ function drawElements() {
 				},
 				onSuccess: function(json) {
 					var jsonResponse = json.response;
+					console.log(jsonResponse);
 
 					if (jsonResponse) {
 						var jsonParse = JSON.parse(jsonResponse);
@@ -178,15 +179,7 @@ function drawElements() {
 		setHtmlToAttribute ("DivDeleteDateBtn", getDeleteDateButtonHtml());
 		setHtmlToAttribute ("DivClearDateBtn", getClearDateButtonHtml());
 		
-		var mday = new Date();
-		mday.setMonth(mday.getMonth() - 1);
-		drawOneMoreDate(toFormattedDate(mday));
-		
-		var fortnight = new Date();
-		fortnight.setDate(fortnight.getDate() - 14);
-		drawOneMoreDate(toFormattedDate(fortnight));
-		
-		drawOneMoreDate();
+		initialDates();
 	}
 
 	initAndDrawCheckboxes();
@@ -203,7 +196,7 @@ function deleteDate() {
 		currDate.obj.destroy();
 	}
 }
-function clearDates() {
+function initialDates() {
 	var currDate;
 	
 	datesParams.forEach(function(element) {
@@ -213,6 +206,16 @@ function clearDates() {
 	});
 	
 	datesParams = [];
+	
+	var mday = new Date();
+	mday.setMonth(mday.getMonth() - 1);
+	drawOneMoreDate(toFormattedDate(mday));
+	
+	var fortnight = new Date();
+	fortnight.setDate(fortnight.getDate() - 14);
+	drawOneMoreDate(toFormattedDate(fortnight));
+	
+	drawOneMoreDate();
 }
 
 function drawOneMoreDate(date) {
@@ -1201,7 +1204,7 @@ function getDeleteDateButtonHtml(){
 }
 
 function getClearDateButtonHtml(){
-    var html = "<a href=\"#\" onclick=\"clearDates()\"><img src=\"data:image/gif;base64," +
+    var html = "<a href=\"#\" onclick=\"initialDates()\"><img src=\"data:image/gif;base64," +
 		"iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNn" +
 		"VFPpFj333vRCS4iAlEtvUhUIIFJCi4AUkSYqIQkQSoghodkVUcERRUUEG8igiAOOjoCMFVEsDIoK2AfkIaKOg6OIisr74Xuja9a89+bN/rXXPues852zzwfA" +
 		"CAyWSDNRNYAMqUIeEeCDx8TG4eQuQIEKJHAAEAizZCFz/SMBAPh+PDwrIsAHvgABeNMLCADATZvAMByH/w/qQplcAYCEAcB0kThLCIAUAEB6jkKmAEBGAYCd" +
