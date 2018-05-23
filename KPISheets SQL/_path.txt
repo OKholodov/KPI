@@ -1,0 +1,1 @@
+/u02/netcracker/toms/u80_d689_6335/applications/NetCracker/queries/oracle/com/netcracker/solutions/titalia/sparkle/kpiReports/KPISQLData

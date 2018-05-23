@@ -1,149 +1,20 @@
 CREATE OR REPLACE PACKAGE PKG_TIS_KPI
 IS
-  FUNCTION SPLIT_STR_TO_ARRAYOFSTRINGS(in_str in varchar2, in_sorted in number default 0) RETURN arrayofstrings DETERMINISTIC;
+  FUNCTION SPLIT_STR_TO_ARRAYOFSTRINGS(in_str in varchar2, in_format_dates in number default 0) RETURN arrayofstrings DETERMINISTIC;
   PROCEDURE CREATE_SNAPSHOT;
-  FUNCTION GET_ORDER_BY_STATUS_T_HEADER RETURN varchar2;
-  FUNCTION GET_ORDER_BY_STATUS_T_DATA RETURN varchar2;
   
   TYPE t_data IS TABLE OF varchar2(4000);
-  FUNCTION get_ut_by_name(in_dates VARCHAR2) RETURN t_data PIPELINED;
+  FUNCTION GET_UT_BY_NAME(in_dates VARCHAR2) RETURN t_data PIPELINED;
 
 END PKG_TIS_KPI;
 /
 CREATE OR REPLACE PACKAGE BODY PKG_TIS_KPI
 IS
 
-  FUNCTION GET_ORDER_BY_STATUS_T_HEADER
-    RETURN varchar2
-  IS
-    v_ret varchar2(30000);
-  BEGIN
-    v_ret := 
-            q'<
-                 {
-                     cells: [
-                         {
-                             type: 'header',
-                             value: 'Execution Date',
-                             filter: true
-                         },
-                         {
-                             type: 'header',
-                             value: 'Suspended'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Cancelled'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Completed'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Superseded'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Processing'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Archived'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Entering'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Suspending'
-                         },
-                         {
-                             type: 'header',
-                             value: 'Total'
-                         }
-                      ]
-                 }>'
-    ;
-
-    return v_ret;
-  
-  END GET_ORDER_BY_STATUS_T_HEADER;
-  
-  FUNCTION GET_ORDER_BY_STATUS_T_DATA
-    RETURN varchar2
-  IS
-    v_ret varchar2(32767);
-  BEGIN
-
-    select q'<{
-              cells: [
-                {
-                  type: 'datetime',
-                  value: '>' || ed || q'<'
-                },
-                {
-                  type: 'number',
-                  value: >' || Suspended || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Cancelled || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Completed || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Superseded || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Processing || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Archived || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Entering || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Suspending || q'<
-                },
-                {
-                  type: 'number',
-                  value: >' || Total || q'<
-                }
-              ]
-            }>' as data
-    into v_ret
-    from (
-      select 
-          to_date(execution_date) ed,
-          sum(decode(status, 'Suspended',   order_sum, 0)) Suspended,
-          sum(decode(status, 'Cancelled',   order_sum, 0)) Cancelled,
-          sum(decode(status, 'Completed',   order_sum, 0)) Completed,
-          sum(decode(status, 'Superseded',  order_sum, 0)) Superseded,
-          sum(decode(status, 'Processing',  order_sum, 0)) Processing,
-          sum(decode(status, 'Archived',    order_sum, 0)) Archived,
-          sum(decode(status, 'Entering',    order_sum, 0)) Entering,
-          sum(decode(status, 'Suspending',  order_sum, 0)) Suspending,
-          sum(order_sum) Total
-      from kpi_orders
-      group by  to_date(execution_date)
-    )
-    order by ed;
-  
-    return v_ret;
-  
-  END GET_ORDER_BY_STATUS_T_DATA;
-  
-  FUNCTION SPLIT_STR_TO_ARRAYOFSTRINGS(in_str in varchar2, in_sorted in number default 0) RETURN arrayofstrings
+  FUNCTION SPLIT_STR_TO_ARRAYOFSTRINGS(
+    in_str in varchar2, 
+    in_format_dates in number default 0 --Return string of sorted, distinct dates which are exists in kpi_orders table
+   ) RETURN arrayofstrings
     DETERMINISTIC
   IS
     ret arrayofstrings;
@@ -154,12 +25,12 @@ IS
     FROM dual
     CONNECT BY regexp_substr(in_str , '[^,]+', 1, LEVEL) IS NOT NULL;*/
     
-    if in_sorted = 0 then
+    if in_format_dates = 0 then
       SELECT trim(COLUMN_VALUE) str
       bulk collect into ret
       FROM xmltable(('"' || REPLACE(in_str, ',', '","') || '"'));
     else
-      SELECT trim(COLUMN_VALUE) str
+      SELECT distinct trim(COLUMN_VALUE) str
       bulk collect into ret
       FROM xmltable(('"' || REPLACE(in_str, ',', '","') || '"'))
       where exists (
@@ -173,7 +44,7 @@ IS
     return ret;
   END SPLIT_STR_TO_ARRAYOFSTRINGS;
   
-  FUNCTION get_ut_by_name(in_dates VARCHAR2) RETURN t_data PIPELINED
+  FUNCTION GET_UT_BY_NAME(in_dates VARCHAR2) RETURN t_data PIPELINED
   IS
     cur sys_refcursor;
     tp varchar2(4000);
@@ -216,8 +87,8 @@ IS
     select   q'< {"id": ' || rownum || ', "columns": [ >' ||
                 listagg(
                 q'[{"value": "']' || ' || d' || level || ' || ' || q'['" }]' ||
-                case when level < v_dates_cnt then q'[,{"value": "']' || ' || delta' || level || ' || ' || q'['" }]' end
-               ,',') within group (order by null) ||
+                case when level < v_dates_cnt and v_dates_cnt > 1 then q'[,{"value": "']' || ' || delta' || level || ' || ' || q'['" }]' end
+               ,',') within group (order by level) ||
              q'< ], "initIndex": ' || (rownum-1) || '} ' >' as p1
     into v_head
     from dual
@@ -226,13 +97,16 @@ IS
     dbms_output.put_line('Head=' || v_head);
     
     -- Head2
-    select listagg( ('d' || level || ',
-    d' || level || ' - d' || (level + 1) || ' as delta' || level), ',
-    ') within group (order by null) as str
+    select listagg( ('d' || level || case when v_dates_cnt > 1 then (',
+    d' || level || ' - d' || (level + 1) || ' as delta' || level) end), ',
+    ') within group (order by level) as str
     into v_head2
     from dual
     connect by level < v_dates_cnt;
-    v_head2 := v_head2 || ', d' || v_dates_cnt;
+    
+    if v_dates_cnt > 1 then 
+      v_head2 := v_head2 || ', d' || v_dates_cnt;
+    end if;
     
     dbms_output.put_line('Head2=' || v_head2);
     
@@ -268,7 +142,7 @@ IS
     
     RETURN;
     
-  END get_ut_by_name;
+  END GET_UT_BY_NAME;
   
 
   PROCEDURE CREATE_SNAPSHOT

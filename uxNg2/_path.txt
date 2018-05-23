@@ -1,0 +1,3 @@
+/u02/netcracker/toms/u80_d689_6335/applications/NetCracker/NetCrackerWebApp/ux-ng2-embedded-components
+
+Рабочая - uxNg2_embeddded_0.05

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--<base href="/">-->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Landing</title>
+        <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+        <link rel="stylesheet" id="themeStyleSheet" href="assets/base.css">
+        <script src="/scripts/prototype.js"></script>
+        <script>
+//            if (!Function.prototype.bind) {
+                Function.prototype.bind = function(oThis) {
+                    if (typeof this !== 'function') {
+                        // closest thing possible to the ECMAScript 5
+                        // internal IsCallable function
+                        throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+                    }
+
+                    var aArgs   = Array.prototype.slice.call(arguments, 1),
+                        fToBind = this,
+                        fNOP    = function() {},
+                        fBound  = function() {
+                            return fToBind.apply(this instanceof fNOP
+                                ? this
+                                : oThis,
+                                aArgs.concat(Array.prototype.slice.call(arguments)));
+                        };
+
+                    if (this.prototype) {
+                        // Function.prototype doesn't have a prototype property
+                        fNOP.prototype = this.prototype;
+                    }
+                    fBound.prototype = new fNOP();
+
+                    return fBound;
+                };
+//            }
+        </script>
+    </head>
+<body>
+<div id="table"></div>
+<div id="graph"></div>
+<script type="text/javascript" src="./ng-app.js"></script>
+<script>
+
+    setTimeout(function() {
+
+        var model = {
+            model: {rows: [
+                {
+                    cells: [
+                        {
+                            type: 'header',
+                            value: ''
+                        },
+                        {
+                            type: 'header',
+                            value: 'Composite Orders',
+                            filter: true
+                        },
+                        {
+                            type: 'header',
+                            value: 'Service Orders',
+                            filter: true
+                        },
+                        {
+                            type: 'header',
+                            value: 'Business Scenario'
+                        }
+                    ]
+                }, {
+                    cells: [
+                        {
+                            type: 'checkbox',
+                            value: true
+                        },
+                        {
+                            value: 'AIDA Composite Order #0000001339',
+                            href: '#',
+                            rowspan: 2
+                        },
+                        {
+                            value: 'Extend Expiry Date',
+                            colspan: 2
+                        }
+                    ]
+                }, {
+                    cells: [
+                        {
+                            type: 'checkbox',
+                            value: true
+                        },
+                        {
+                            value: 'In-flight New Data Service CFS Order #0000001361',
+                            href: '#'
+                        },
+                        {
+                            value: 'Extend Expiry Date'
+                        }
+                    ]
+                }
+            ]}
+        };
+
+        var component = uxNg2.createComponent("#table", "UxGridTableComponent", model);
+
+        var graphModel = {
+           model: {
+               "chart": {},
+               "title": {
+                   "text": ""
+               },
+               "credits": {
+                   "enabled": false
+               },
+               "xAxis": {
+                   "categories": [
+                       "September",
+                       "October",
+                       "November",
+                       "December",
+                       "January"
+                   ]
+               },
+               "labels": {
+                   "items": [
+                       {
+                           "html": "",
+                           "style": {
+                               "left": "50px",
+                               "top": "18px",
+                               "color": "black"
+                           }
+                       }
+                   ]
+               },
+               "series": [
+                   {
+                       "type": "column",
+                       "name": "Step",
+                       "data": [
+                           0,
+                           4,
+                           2.8,
+                           2.5,
+                           2.4
+                       ]
+                   },
+                   {
+                       "type": "column",
+                       "name": "Stage",
+                       "data": [
+                           1.4,
+                           1.7,
+                           1.6,
+                           1.5,
+                           1.4
+                       ]
+                   },
+                   {
+                       "type": "column",
+                       "name": "Case",
+                       "data": [
+                           0.9,
+                           1.1,
+                           1,
+                           0.9,
+                           1
+                       ]
+                   },
+                   {
+                       "type": "spline",
+                       "name": "Journey",
+                       "data": [
+                           3.5,
+                           5,
+                           3.8,
+                           3.5,
+                           3
+                       ],
+                       "marker": {
+                           "lineWidth": 2,
+                           "lineColor": "#EDD4BF",
+                           "fillColor": "white"
+                       }
+                   }
+               ]
+           }
+        };
+
+        var graphComponent = uxNg2.createComponent("#graph", "UxGraphComponent", graphModel);
+
+
+//        var subscription = component.component.onCellClick.subscribe((event) => {console.log(event)});
+//
+//        setTimeout(()=>{
+//            subscription.unsubscribe();
+//        }, 3000);
+
+    }, 1000);
+
+</script>
+
+
+</body>
+</html>

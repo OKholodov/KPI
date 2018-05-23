@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Webpack Bundle Analyzer</title>
+		<link rel="stylesheet" id="themeStyleSheet" href="assets/base.css">
+		
+	</head>
+	<body>
+	<script type="text/javascript" src="./ng-app.js"></script>
+	<div id="table"></div>
+	<div id="graph" style="min-width: 1110px !important; height: 400px; margin: 0 auto"></div>
+	
+	<script>
+	setTimeout(function() {
+
+        var model = {
+            model: {rows: [
+                {
+                    cells: [
+                        {
+                            type: 'header',
+                            value: 'Execution Date',
+														filter: true
+                        },
+                        {
+                            type: 'header',
+                            value: 'Processing'
+                        },
+                        {
+                            type: 'header',
+                            value: 'Completed'
+                        },
+                        {
+                            type: 'header',
+                            value: 'Cancelled'
+                        }
+												
+                    ]
+                }, {
+                    cells: [
+                        {
+                            type: 'datetime',
+                            value: '12.01.2010'
+                        },
+                        {
+														type: 'number',
+                            value: 1
+                        },
+                        {
+														type: 'number',
+                            value: 13
+                        },
+												{
+														type: 'number',
+                            value: 45
+                        }
+                    ]
+                }, {
+                    cells: [
+                        {
+                            type: 'datetime',
+                            value: '13.01.2010'
+                        },
+                        {
+														type: 'number',
+                            value: 14
+                        },
+                        {
+														type: 'number',
+                            value: 132
+                        },
+												{
+														type: 'number',
+                            value: 451
+                        }
+                    ]
+                },
+								{
+                    cells: [
+                        {
+                            type: 'datetime',
+                            value: '14.01.2010'
+                        },
+                        {
+														type: 'number',
+                            value: 11
+                        },
+                        {
+														type: 'number',
+                            value: 3
+                        },
+												{
+														type: 'number',
+                            value: 66
+                        }
+                    ]
+                }
+            ]}
+        };
+
+        var component = uxNg2.createComponent("#table", "UxGridTableComponent", model);
+
+        var graphModel = {
+           model: {
+               "chart": {},
+               "title": {
+                   "text": ""
+               },
+               "credits": {
+                   "enabled": false
+               },
+               "xAxis": {
+                   "categories": [
+                       "September",
+                       "October",
+                       "November",
+                       "December",
+                       "January",
+											 "January1",
+											 "January2",
+											 "January3",
+											 "January4",
+											 "January5"
+                   ]
+               },
+               "labels": {
+                   "items": [
+                       {
+                           "html": "",
+                           "style": {
+                               "left": "50px",
+                               "top": "18px",
+                               "color": "black"
+                           }
+                       }
+                   ]
+               },
+               "series": [
+                   {
+                       "type": "column",
+                       "name": "Step",
+                       "data": [
+                           0,
+                           4,
+                           2.8,
+                           2.5,
+                           2.4,
+													 2.4,
+													 2.4,
+													 2.4
+                       ]
+                   },
+                   {
+                       "type": "column",
+                       "name": "Stage",
+                       "data": [
+                           1.4,
+                           1.7,
+                           1.6,
+                           1.5,
+                           1.4
+                       ]
+                   },
+                   {
+                       "type": "column",
+                       "name": "Case",
+                       "data": [
+                           0.9,
+                           1.1,
+                           1,
+                           0.9,
+                           1
+                       ]
+                   },
+                   {
+                       "type": "spline",
+                       "name": "Journey",
+                       "data": [
+                           3.5,
+                           5,
+                           3.8,
+                           3.5,
+                           3
+                       ],
+                       "marker": {
+                           "lineWidth": 2,
+                           "lineColor": "#EDD4BF",
+                           "fillColor": "white"
+                       }
+                   }
+               ]
+           }
+        };
+
+        var graphComponent = uxNg2.createComponent("#graph", "UxGraphComponent", graphModel);
+
+
+//        var subscription = component.component.onCellClick.subscribe((event) => {console.log(event)});
+//
+//        setTimeout(()=>{
+//            subscription.unsubscribe();
+//        }, 3000);
+
+    }, 1000);
+
+
+</script>
+	
+  </body>
+</html>
