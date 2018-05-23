@@ -1,0 +1,9 @@
+<configuration_item name="KPI Reports - User Task by Date" id="9150471182413350213" type="nc_attr_group">
+    <nc_attr_group name="KPI Reports - User Task by Date" id="9150471182413350213" attr_access_type="0" show_order="0">
+        <attr_schema _schema_name="Root" id="1"/>
+        <subgroup name="User Task by Date"/>
+        <flags>
+            <supplies_uni_model/>
+        </flags>
+    </nc_attr_group>
+</configuration_item>

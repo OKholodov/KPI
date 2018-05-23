@@ -1,0 +1,9 @@
+<configuration_item name="KPI Reports - Error Orders" id="9150315974413327922" type="nc_attr_group">
+    <nc_attr_group name="KPI Reports - Error Orders" id="9150315974413327922" attr_access_type="0" show_order="0">
+        <attr_schema _schema_name="Root" id="1"/>
+        <subgroup name="Error Orders"/>
+        <flags>
+            <supplies_uni_model/>
+        </flags>
+    </nc_attr_group>
+</configuration_item>

@@ -1,0 +1,42 @@
+<configuration_item name="Top" id="9150296429613324645" type="atom_nc_object" version="1.1">
+    <nc_object name="Top" id="9150296429613324645" _type="KPI Reports" order_number="0">
+        <object_type _type_name="KPI Reports" id="9150296429613324621"/>
+        <object_class _type_name="Site" id="300"/>
+        <project _obj_name="KPI Reports" id="9150296429613324644"/>
+        <picture _picture_name="Sites" id="15554000"/>
+        <description>Top site for project New KPI Reports</description>
+        <param _attr_name="Created By" attr_id="61" attr_access_type="0" priority="1">
+            <value value="sysadm" show_order="1"/>
+        </param>
+        <param _attr_name="Created When" attr_id="62" attr_access_type="0" priority="1">
+            <date_value date_value="2018-03-03 04:01:05.0" show_order="1"/>
+        </param>
+        <param _attr_name="Modified By" attr_id="63" attr_access_type="0" priority="1">
+            <value value="sysadm" show_order="1"/>
+        </param>
+        <param _attr_name="Modified When" attr_id="64" attr_access_type="0" priority="1">
+            <date_value date_value="2018-03-03 04:01:05.0" show_order="1"/>
+        </param>
+        <param _attr_name="NeedGraphLayout" attr_id="10097" attr_access_type="0" priority="1">
+            <value value="1" show_order="1"/>
+        </param>
+        <param _attr_name="First Time In Applet" attr_id="6072556040013963188" attr_access_type="0" priority="1">
+            <value value="1" show_order="1"/>
+        </param>
+        <param _attr_name="ShowGrid" attr_id="6073138670013275767" attr_access_type="0" priority="0">
+            <value value="0" show_order="1"/>
+        </param>
+        <param _attr_name="SnapToGrid" attr_id="6073138670013275769" attr_access_type="0" priority="0">
+            <value value="0" show_order="1"/>
+        </param>
+        <param _attr_name="GridSpacingHorizontal" attr_id="6073138670013275770" attr_access_type="0" priority="0">
+            <value value="10" show_order="1"/>
+        </param>
+        <param _attr_name="GridSpacingVertical" attr_id="6073138670013275771" attr_access_type="0" priority="0">
+            <value value="10" show_order="1"/>
+        </param>
+        <param _attr_name="GridStyle" attr_id="6073138670013275772" attr_access_type="0" priority="0">
+            <value value="lines" show_order="1"/>
+        </param>
+    </nc_object>
+</configuration_item>

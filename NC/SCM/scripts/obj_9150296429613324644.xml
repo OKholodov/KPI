@@ -1,0 +1,29 @@
+<configuration_item name="KPI Reports" id="9150296429613324644" type="atom_nc_object" parent_id="1050" version="1.1">
+    <nc_object name="KPI Reports" id="9150296429613324644" _type="KPI Reports" _parent_name="Document Projects" parent_id="1050" order_number="436">
+        <object_type _type_name="KPI Reports" id="9150296429613324621"/>
+        <object_class _type_name="Document Project" id="90000660"/>
+        <project _obj_name="KPI Reports" id="9150296429613324644"/>
+        <attr_schema _schema_name="Root" id="1"/>
+        <param _attr_name="Created By" attr_id="61" attr_access_type="0" priority="1">
+            <value value="sysadm" show_order="1"/>
+        </param>
+        <param _attr_name="Created When" attr_id="62" attr_access_type="0" priority="1">
+            <date_value date_value="2018-03-03 04:01:05.0" show_order="1"/>
+        </param>
+        <param _attr_name="Modified By" attr_id="63" attr_access_type="0" priority="1">
+            <value value="sysadm" show_order="1"/>
+        </param>
+        <param _attr_name="Modified When" attr_id="64" attr_access_type="0" priority="1">
+            <date_value date_value="2018-05-23 06:54:05.0" show_order="1"/>
+        </param>
+        <param _attr_name="Is Public" attr_id="5052753262013996608" attr_access_type="0" priority="1">
+            <value value="1" show_order="1"/>
+        </param>
+        <param _attr_name="First Time In Applet" attr_id="6072556040013963188" attr_access_type="0" priority="1">
+            <value value="1" show_order="1"/>
+        </param>
+        <param _attr_name="Reference to Top Sites" attr_id="703" attr_access_type="0" priority="1">
+            <reference _obj_name="Top" reference="9150296429613324645" show_order="1"/>
+        </param>
+    </nc_object>
+</configuration_item>

@@ -1,0 +1,8 @@
+<configuration_item name="KPI Reports" id="9150296429613324621" type="nc_grants">
+    <nc_grants _entity_name="KPI Reports" id="9150296429613324621" _entity_type="nc_object_type">
+        <role _role_name="All Users" id="101">
+            <L/>
+            <R/>
+        </role>
+    </nc_grants>
+</configuration_item>

@@ -1,0 +1,24 @@
+<configuration_item name="$" id="9150315974413327921" type="nc_attribute">
+    <nc_attribute name="$" id="9150315974413327921" attr_access_type="0" show_order="3">
+        <attr_type _type_name="ATTR_TYPE_TEXT" id="0"/>
+        <attr_group _group_name="KPI Reports - Error Orders" id="9150315974413327922"/>
+        <attr_schema _schema_name="Root" id="1"/>
+        <unique_level level="0"/>
+        <flags>
+            <hide_objecttype_name/>
+            <supplies_uni_model/>
+        </flags>
+        <params>
+            <param name="g2adapter" value="com.netcracker.solutions.titalia.sparkle.kpiReports.KPISheetErrorOrders"/>
+        </params>
+        <bindings>
+            <binding object_type_name="KPI Reports" object_type_id="9150296429613324621" attr_schema_name="Root" attr_schema_id="1">
+                <isdisplayed flag="0"/>
+                <required flag="0"/>
+                <options>
+                    <public_bind/>
+                </options>
+            </binding>
+        </bindings>
+    </nc_attribute>
+</configuration_item>
